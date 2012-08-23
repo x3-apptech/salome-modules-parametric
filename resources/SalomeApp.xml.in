@@ -1,0 +1,18 @@
+<document>
+  <section name="PARAMETRIC">
+    <!-- Major module parameters -->
+    <parameter name="name"              value="Parametric"/>
+    <parameter name="icon"              value="PARAMETRIC.png"/>
+    <parameter name="library"           value="SalomePyQtGUI"/>
+    <parameter name="documentation"     value="parametric_help"/>
+    <parameter name="version"           value="@VERSION@"/>
+  </section>
+  <section name="resources">
+    <!-- Module resources -->
+    <parameter name="PARAMETRIC" value="%PARAMETRIC_ROOT_DIR%/@RESDIR@"/>
+  </section>
+  <section name="parametric_help">
+    <parameter name="sub_menu"     value="%1 module"/>
+    <parameter name="User's Guide" value="%PARAMETRIC_ROOT_DIR%/@DOCDIR@/index.html"/>
+  </section>
+</document>
