@@ -209,24 +209,24 @@ def run_study():
 
 def export_to_csv():
   qapp = QtGui.QApplication
-  try:
-    qapp.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-    study_id = sgPyQt.getStudyId()
-    entry = salome.sg.getSelected(0)
-    ed = ParametricStudyEditor(study_id)
-    param_study = ed.get_parametric_study(entry)
-    filename = QtGui.QFileDialog.getSaveFileName(sgPyQt.getDesktop(),
-                                                 qapp.translate("export_to_csv", "Export data to CSV file"),
-                                                 filter = qapp.translate("export_to_csv", "CSV files (*.csv)"))
-    if filename is not None and len(filename) > 0:
-      param_study.export_data_to_csv_file(filename)
-    qapp.restoreOverrideCursor()
-  except Exception, exc:
-    qapp.restoreOverrideCursor()
-    logger.exception("Export to CSV file failed")
-    QtGui.QMessageBox.critical(sgPyQt.getDesktop(),
-      qapp.translate("export_to_csv", "Error"),
-      qapp.translate("export_to_csv", "Export to CSV file failed: %s" % exc))
+  filename = QtGui.QFileDialog.getSaveFileName(sgPyQt.getDesktop(),
+                                               qapp.translate("export_to_csv", "Export data to CSV file"),
+                                               filter = qapp.translate("export_to_csv", "CSV files (*.csv)"))
+  if filename is not None and len(filename) > 0:
+    try:
+        qapp.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+        study_id = sgPyQt.getStudyId()
+        entry = salome.sg.getSelected(0)
+        ed = ParametricStudyEditor(study_id)
+        param_study = ed.get_parametric_study(entry)
+        param_study.export_data_to_csv_file(filename)
+        qapp.restoreOverrideCursor()
+    except Exception, exc:
+      qapp.restoreOverrideCursor()
+      logger.exception("Export to CSV file failed")
+      QtGui.QMessageBox.critical(sgPyQt.getDesktop(),
+        qapp.translate("export_to_csv", "Error"),
+        qapp.translate("export_to_csv", "Export to CSV file failed: %s" % exc))
 
 # ----------------------- #
 dict_command = {
