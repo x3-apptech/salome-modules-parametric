@@ -46,6 +46,12 @@
    </item>
    <item>
     <widget class="QDoubleSpinBox" name="fromSpinBox">
+     <property name="minimum">
+      <double>-1000000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000000.000000000000000</double>
+     </property>
      <property name="value">
       <double>0.000000000000000</double>
      </property>
@@ -63,6 +69,12 @@
    </item>
    <item>
     <widget class="QDoubleSpinBox" name="toSpinBox">
+     <property name="minimum">
+      <double>-1000000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000000.000000000000000</double>
+     </property>
      <property name="value">
       <double>10.000000000000000</double>
      </property>
@@ -80,6 +92,12 @@
    </item>
    <item>
     <widget class="QDoubleSpinBox" name="stepSpinBox">
+     <property name="minimum">
+      <double>-1000000.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>1000000.000000000000000</double>
+     </property>
      <property name="value">
       <double>1.000000000000000</double>
      </property>
