@@ -29,7 +29,7 @@ from salome.parametric.study import ParametricVariable, ParametricStudy, Paramet
 
 
 class Wizard(QtGui.QWidget, Ui_Wizard):
-  
+
   def __init__(self, parent = None):
     QtGui.QWidget.__init__(self, parent)
     self.setupUi(self)
@@ -37,50 +37,56 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     self.connect(self.previousButton, QtCore.SIGNAL("clicked()"), self.previous_step)
     self.connect(self.OKButton, QtCore.SIGNAL("clicked()"), self.validate)
     self.connect(self.cancelButton, QtCore.SIGNAL("clicked()"), self.close)
+    self.step_labels = []
+    for i in range(len(self.step_texts)):
+      self.step_labels.append(QtGui.QLabel(self))
+      self.stepLayout.addWidget(self.step_labels[i])
     self.select_vars_frame = SelectVarsFrame(self)
-    self.innerFrame.layout().addWidget(self.select_vars_frame)
     self.define_values_frame = DefineValuesFrame(self)
-    self.innerFrame.layout().addWidget(self.define_values_frame)
     self.exec_params_frame = EficasFrame(self)
-    self.innerFrame.layout().addWidget(self.exec_params_frame)
-    self.reset_step()
-    self.step = 1
-    self.step_methods[self.step](self)
+    self.step_frames = [self.select_vars_frame,
+                        self.define_values_frame,
+                        self.exec_params_frame]
+    for frame in self.step_frames:
+      self.innerFrame.layout().addWidget(frame)
+    self.curstep = 0
+    self.step()
     self.entry = None
     self.view_id = None
 
   def next_step(self):
-    self.reset_step()
-    self.step += 1
-    self.step_methods[self.step](self)
+    self.curstep += 1
+    self.step()
 
   def previous_step(self):
-    self.reset_step()
-    self.step -= 1
-    self.step_methods[self.step](self)
+    self.curstep -= 1
+    self.step()
 
-  def reset_step(self):
-    self.select_vars_frame.hide()
-    self.define_values_frame.hide()
-    self.exec_params_frame.hide()
-    self.OKButton.hide()
-    self.previousButton.show()
-    self.nextButton.show()
-
-  def define_variables(self):
-    self.select_vars_frame.show()
-    self.previousButton.hide()
+  def step(self):
+    for i in range(len(self.step_texts)):
+      if i == self.curstep:
+        self.step_labels[i].setText("<b>" + self.tr(self.step_texts[i]) + "</b>")
+        self.step_frames[i].show()
+      else:
+        self.step_labels[i].setText(self.tr(self.step_texts[i]))
+        self.step_frames[i].hide()
+    if self.curstep == 0:
+      self.previousButton.hide()
+    else:
+      self.previousButton.show()
+    if self.curstep == len(self.step_texts)-1:
+      self.nextButton.hide()
+      self.OKButton.show()
+    else:
+      self.nextButton.show()
+      self.OKButton.hide()
+    if self.step_methods[self.curstep] is not None:
+      self.step_methods[self.curstep](self)
 
   def define_values(self):
     exchange_vars = self.select_vars_frame.getSelectedExchangeVariables()
     self.define_values_frame.set_variables(exchange_vars.inputVarList)
-    self.define_values_frame.show()
 
-  def define_exec_params(self):
-    self.exec_params_frame.show()
-    self.nextButton.hide()
-    self.OKButton.show()
-  
   def validate(self):
     param_study = ParametricStudy()
     # Input variables
@@ -117,6 +123,10 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     if self.view_id is not None:
       sgPyQt.closeView(self.view_id)
 
-  step_methods = {1: define_variables,
-                  2: define_values,
-                  3: define_exec_params}
+  step_texts = ["Step 1: Parametric Variables",
+                "Step 2: Sample Definition",
+                "Step 3: Execution Parameters"]
+
+  step_methods = [None,
+                  define_values,
+                  None]
