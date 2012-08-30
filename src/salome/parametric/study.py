@@ -29,21 +29,6 @@ COMPONENT_ICON = "PARAMETRIC_small.png"
 PARAM_STUDY_ICON = "param_study.png"
 PARAM_STUDY_TYPE_ID = 1
 
-def jdc_to_dict(jdc, command_list):
-    """
-    This tricky function transforms a JdC with a single command into a
-    dictionary that can be used more easily from a Python context (thanks to
-    M. Courtois and G. Boulant).
-    """
-    context = {}
-    for command in command_list:
-        context[command] = _args_to_dict
-    exec "parameters = " + jdc.strip() in context
-    return context['parameters']
-
-def _args_to_dict(**kwargs):
-    return kwargs
-
 class ParametricStudyEditor:
   """
   This class provides utility methods to edit the component "Parametric" in
@@ -74,7 +59,7 @@ class ParametricStudyEditor:
 
   def _set_sobj(self, parametric_study, sobj):
     self.editor.setItem(sobj,
-                        name = parametric_study.get_exec_param("PARAMETRIC_STUDY_NAME"),
+                        name = parametric_study.name,
                         comment = cPickle.dumps(parametric_study),
                         icon = PARAM_STUDY_ICON,
                         typeId = PARAM_STUDY_TYPE_ID)
@@ -90,19 +75,27 @@ class ParametricStudyEditor:
 
 class ParametricVariable:
 
-  def __init__(self, name, min = None, max = None, step = None):
+  def __init__(self, name, minval = None, maxval = None, step = None):
     self.name = name
-    self.min = min
-    self.max = max
+    self.min = minval
+    self.max = maxval
     self.step = step
 
 
 class ParametricStudy:
+  
+  SALOME_COMPONENT = 0
+  PYTHON_SCRIPT = 1
 
   def __init__(self):
     self.input_vars = []
     self.output_vars = []
-    self.exec_params = None
+    self.solver_code_type = ParametricStudy.SALOME_COMPONENT
+    self.salome_component_name = None
+    self.solver_case_entry = None
+    self.python_script = None
+    self.name = None
+    self.nb_parallel_computations = 1
     self.data = None
     self.datasize = 0
     self._value_dict = None
@@ -114,13 +107,6 @@ class ParametricStudy:
   def add_output_variable(self, varname):
     self.output_vars.append(varname)
 
-  def set_exec_params(self, params):
-    self.exec_params = params
-
-  def get_exec_param(self, name):
-    param_dict = jdc_to_dict(self.exec_params, ["EXECUTION_PARAMETERS"])
-    return param_dict[name]
-  
   def generate_data(self):
     self.data = {}
     self.datasize = 0

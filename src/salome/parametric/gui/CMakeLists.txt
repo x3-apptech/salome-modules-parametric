@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-SET(PYUIC_FILES wizard_ui.py varrange_ui.py)
+SET(PYUIC_FILES wizard_ui.py varrange_ui.py execparams_ui.py)
 SET(INSTALL_DIR ${PYTHONDIR}/salome/parametric/gui)
 
 FOREACH(OUTPUT ${PYUIC_FILES})

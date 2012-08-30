@@ -99,10 +99,10 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       if param_input_tc is None:
         raise Exception ("Internal error: No typecode found for type 'SALOME_TYPES/ParametricInput'")
       foreach = pilot.ForEachLoop("ForEach", param_input_tc)
-      foreach.edGetNbOfBranchesPort().edInit(param_study.get_exec_param("NUMBER_OF_PARALLEL_COMPUTATIONS"))
+      foreach.edGetNbOfBranchesPort().edInit(param_study.nb_parallel_computations)
       proc.edAddChild(foreach)
 
-      solver_code = param_study.get_exec_param("SOLVER_CODE")
+      solver_code = param_study.salome_component_name
       solver_compo_inst = proc.createComponentInstance(solver_code)
       solver_compo_def = self.session_catalog._componentMap[solver_code]
       
@@ -113,7 +113,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       init_solver = solver_compo_def._serviceMap["Init"].clone(None)
       init_solver.setComponent(solver_compo_inst)
       init_solver.getInputPort("studyID").edInit(studyId)
-      entry = self._parse_entry(param_study.get_exec_param("DETERMINISTIC_CASE_ENTRY"))
+      entry = self._parse_entry(param_study.solver_case_entry)
       init_solver.getInputPort("detCaseEntry").edInit(entry)
       foreach.edSetInitNode(init_solver)
 
@@ -174,7 +174,6 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       # Launch computation
       executor = pilot.ExecutorSwig()
       executor.RunPy(proc)
-      state = proc.getEffectiveState()
       if proc.getEffectiveState() != pilot.DONE:
         msg = proc.getErrorReport()
         if msg != "":

@@ -24,7 +24,7 @@ sgPyQt = SalomePyQt.SalomePyQt()
 from wizard_ui import Ui_Wizard
 from selectvars import SelectVarsFrame
 from definevalues import DefineValuesFrame
-from salome.parametric.gui.eficas.appli import EficasFrame
+from execparams import ExecParamsFrame
 from salome.parametric.study import ParametricVariable, ParametricStudy, ParametricStudyEditor
 
 
@@ -43,7 +43,7 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
       self.stepLayout.addWidget(self.step_labels[i])
     self.select_vars_frame = SelectVarsFrame(self)
     self.define_values_frame = DefineValuesFrame(self)
-    self.exec_params_frame = EficasFrame(self)
+    self.exec_params_frame = ExecParamsFrame(self)
     self.step_frames = [self.select_vars_frame,
                         self.define_values_frame,
                         self.exec_params_frame]
@@ -91,18 +91,18 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     param_study = ParametricStudy()
     # Input variables
     for (name, range_widget) in self.define_values_frame.varwidgets.iteritems():
-      min = range_widget.fromSpinBox.value()
-      max = range_widget.toSpinBox.value()
+      minval = range_widget.fromSpinBox.value()
+      maxval = range_widget.toSpinBox.value()
       step = range_widget.stepSpinBox.value()
-      var = ParametricVariable(name, min, max, step)
+      var = ParametricVariable(name, minval, maxval, step)
       param_study.add_input_variable(var)
     # Output variables
     exch_vars = self.select_vars_frame.getSelectedExchangeVariables()
     for outvar in exch_vars.outputVarList:
       param_study.add_output_variable(outvar.name)
     # Execution parameters
-    exec_params_comm = self.exec_params_frame.get_text_jdc()
-    param_study.set_exec_params(exec_params_comm)
+    self.exec_params_frame.gui_to_study(param_study)
+
     # Save to Salome study
     ed = ParametricStudyEditor()
     if self.entry is not None:
@@ -116,7 +116,7 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     self.entry = param_study.entry
     self.select_vars_frame.set_vars_from_param_study(param_study)
     self.define_values_frame.set_ranges_from_param_study(param_study)
-    self.exec_params_frame.set_exec_params_from_param_study(param_study)
+    self.exec_params_frame.study_to_gui(param_study)
 
   def close(self):
     QtGui.QWidget.close(self)

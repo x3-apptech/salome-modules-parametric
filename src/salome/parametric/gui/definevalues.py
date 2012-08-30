@@ -49,6 +49,7 @@ class DefineValuesFrame(QtGui.QWidget):
       varrange.nameLabel.setText(var)
       self.varwidgets[var] = varrange
       self.layout().addWidget(varrange)
+    self.layout().addStretch()
 
   def set_ranges_from_param_study(self, param_study):
     for var in param_study.input_vars:
@@ -59,3 +60,4 @@ class DefineValuesFrame(QtGui.QWidget):
       varrange.stepSpinBox.setValue(var.step)
       self.varwidgets[var.name] = varrange
       self.layout().addWidget(varrange)
+    self.layout().addStretch()

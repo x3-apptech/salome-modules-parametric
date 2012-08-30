@@ -24,11 +24,11 @@ class MainPanel():
 
   def new_study(self):
     wizard = Wizard(sgPyQt.getDesktop())
-    id = sgPyQt.createView("New Parametric Study", wizard)
-    wizard.view_id = id
+    view_id = sgPyQt.createView("New Parametric Study", wizard)
+    wizard.view_id = view_id
 
   def edit_study(self, param_study):
     wizard = Wizard(sgPyQt.getDesktop())
     wizard.set_study(param_study)
-    id = sgPyQt.createView(param_study.get_exec_param("PARAMETRIC_STUDY_NAME"), wizard)
-    wizard.view_id = id
+    view_id = sgPyQt.createView(param_study.name, wizard)
+    wizard.view_id = view_id
