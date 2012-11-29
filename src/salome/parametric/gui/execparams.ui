@@ -19,7 +19,7 @@
      <property name="title">
       <string>Solver Code</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QRadioButton" name="salomeComponentRB">
         <property name="text">
@@ -119,9 +119,6 @@
       </item>
       <item>
        <widget class="QRadioButton" name="pythonScriptRB">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="text">
          <string>Python Script</string>
         </property>
@@ -143,17 +140,26 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>25</width>
-            <height>10</height>
+            <height>13</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="QTextEdit" name="pythonScriptTE">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLabel" name="pyscriptLabel">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTextEdit" name="pythonScriptTE"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>

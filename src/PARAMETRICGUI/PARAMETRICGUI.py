@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 import logging
 
 from PyQt4 import QtGui, QtCore
@@ -33,11 +32,10 @@ from salome.kernel.logger import Logger
 from salome.kernel import termcolor
 logger = Logger("PARAMETRICGUI", color = termcolor.GREEN_FG)
 #logger.setLevel(logging.ERROR)
-from salome.kernel.parametric import study_exchange_vars
 
 import PARAMETRIC
-from salome.parametric.gui.mainpanel import MainPanel
-from salome.parametric.study import ParametricStudyEditor
+from salome.parametric.gui import MainPanel
+from salome.parametric import ParametricStudyEditor
 
 ################################################
 # GUI context class

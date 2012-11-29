@@ -32,3 +32,11 @@ class SelectVarsFrame(MySelectVarsDialog):
     output_var_list = [study_exchange_vars.Variable(varname) for varname in param_study.output_vars]
     exchange_vars = study_exchange_vars.ExchangeVariables(input_var_list, output_var_list)
     self.setExchangeVariables(exchange_vars)
+
+  def check_values(self):
+    if self.selectedInputVarListWidget.count() == 0:
+      QtGui.QMessageBox.critical(self, self.tr("Error"),
+                                 self.tr("There must be at least one selected input variable"))
+      return False
+    else:
+      return True

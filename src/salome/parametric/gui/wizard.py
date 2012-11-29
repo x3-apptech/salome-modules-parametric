@@ -25,7 +25,7 @@ from wizard_ui import Ui_Wizard
 from selectvars import SelectVarsFrame
 from definevalues import DefineValuesFrame
 from execparams import ExecParamsFrame
-from salome.parametric.study import ParametricVariable, ParametricStudy, ParametricStudyEditor
+from salome.parametric import ParametricVariable, ParametricStudy, ParametricStudyEditor
 
 
 class Wizard(QtGui.QWidget, Ui_Wizard):
@@ -55,12 +55,14 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     self.view_id = None
 
   def next_step(self):
-    self.curstep += 1
-    self.step()
+    if self.step_frames[self.curstep].check_values():
+      self.curstep += 1
+      self.step()
 
   def previous_step(self):
-    self.curstep -= 1
-    self.step()
+    if self.step_frames[self.curstep].check_values():
+      self.curstep -= 1
+      self.step()
 
   def step(self):
     for i in range(len(self.step_texts)):
@@ -87,7 +89,13 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     exchange_vars = self.select_vars_frame.getSelectedExchangeVariables()
     self.define_values_frame.set_variables(exchange_vars.inputVarList)
 
+  def set_pyscript_label(self):
+    exchange_vars = self.select_vars_frame.getSelectedExchangeVariables()
+    self.exec_params_frame.set_pyscript_label_from_vars(exchange_vars)
+
   def validate(self):
+    if not self.step_frames[self.curstep].check_values():
+      return
     param_study = ParametricStudy()
     # Input variables
     for (name, range_widget) in self.define_values_frame.varwidgets.iteritems():
@@ -129,4 +137,4 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
 
   step_methods = [None,
                   define_values,
-                  None]
+                  set_pyscript_label]

@@ -61,3 +61,6 @@ class DefineValuesFrame(QtGui.QWidget):
       varrange.stepSpinBox.setValue(var.step)
       self.varwidgets[var.name] = varrange
       self.layout().insertWidget(self.layout().count()-1, varrange)
+
+  def check_values(self):
+    return True

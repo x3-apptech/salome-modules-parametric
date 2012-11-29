@@ -37,7 +37,7 @@ from salome.kernel import termcolor
 logger = Logger("PARAMETRIC", color = termcolor.BLUE)
 logger.setLevel(logging.DEBUG)
 
-from salome.parametric.study import ParametricStudyEditor
+from salome.parametric import ParametricStudyEditor
 
 class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOME_DriverPy_i):
 

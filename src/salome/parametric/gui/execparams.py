@@ -20,7 +20,7 @@ from PyQt4 import QtGui, QtCore
 import salome
 from salome.kernel.studyedit import getStudyEditor
 
-from salome.parametric.study import ParametricStudy
+from salome.parametric import ParametricStudy
 from execparams_ui import Ui_ExecParams
 
 
@@ -31,6 +31,33 @@ class ExecParamsFrame(QtGui.QWidget, Ui_ExecParams):
     self.setupUi(self)
     self.connect(self.selectFromSalomeButton, QtCore.SIGNAL("clicked()"), self.select_from_salome)
     self.case_entry = None
+  
+  def set_pyscript_label_from_vars(self, exchange_vars):
+    text = ""
+    input_var_names = [var.name for var in exchange_vars.inputVarList]
+    text += "This script can use variable"
+    if len(input_var_names) > 1:
+      text += "s"
+    for i, var in enumerate(input_var_names):
+      if len(input_var_names) > 1 and i == len(input_var_names) - 1:
+        text += " and"
+      elif i != 0:
+        text += ","
+      text += " <b>" + var + "</b>"
+    text += "."
+    output_var_names = [var.name for var in exchange_vars.outputVarList]
+    if len(output_var_names) > 0:
+      text += "<br>It must create variable"
+      if len(output_var_names) > 1:
+        text += "s"
+      for i, var in enumerate(output_var_names):
+        if len(output_var_names) > 1 and i == len(output_var_names) - 1:
+          text += " and"
+        elif i != 0:
+          text += ","
+        text += " <b>" + var + "</b>"
+      text += "."
+    self.pyscriptLabel.setText(text)
   
   def select_from_salome(self):
     nb_entries = salome.sg.SelectedCount()
@@ -54,7 +81,7 @@ class ExecParamsFrame(QtGui.QWidget, Ui_ExecParams):
       param_study.solver_case_entry = self.case_entry
     else:
       param_study.solver_code_type = ParametricStudy.PYTHON_SCRIPT
-      param_study.python_script = str(self.pythonScriptTE.text())
+      param_study.python_script = str(self.pythonScriptTE.toPlainText())
     param_study.name = str(self.studyNameLE.text())
     param_study.nb_parallel_computations = self.nbParallelSB.value()
 
@@ -68,3 +95,6 @@ class ExecParamsFrame(QtGui.QWidget, Ui_ExecParams):
       self.pythonScriptTE.setText(param_study.python_script)
     self.studyNameLE.setText(param_study.name)
     self.nbParallelSB.setValue(param_study.nb_parallel_computations)
+
+  def check_values(self):
+    return True
