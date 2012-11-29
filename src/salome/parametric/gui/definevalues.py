@@ -35,6 +35,7 @@ class DefineValuesFrame(QtGui.QWidget):
     QtGui.QWidget.__init__(self, parent)
     self.setLayout(QtGui.QVBoxLayout(self))
     self.varwidgets = {}
+    self.layout().addStretch()
 
   def set_variables(self, varlist):
     previous_set = set(self.varwidgets.keys())
@@ -42,14 +43,14 @@ class DefineValuesFrame(QtGui.QWidget):
     var_to_remove = previous_set - new_set
     var_to_add = new_set - previous_set
     for var in var_to_remove:
+      self.layout().removeWidget(self.varwidgets[var])
       self.varwidgets[var].close()
       del self.varwidgets[var]
     for var in var_to_add:
       varrange = VariableRange(self)
       varrange.nameLabel.setText(var)
       self.varwidgets[var] = varrange
-      self.layout().addWidget(varrange)
-    self.layout().addStretch()
+      self.layout().insertWidget(self.layout().count()-1, varrange)
 
   def set_ranges_from_param_study(self, param_study):
     for var in param_study.input_vars:
@@ -59,5 +60,4 @@ class DefineValuesFrame(QtGui.QWidget):
       varrange.toSpinBox.setValue(var.max)
       varrange.stepSpinBox.setValue(var.step)
       self.varwidgets[var.name] = varrange
-      self.layout().addWidget(varrange)
-    self.layout().addStretch()
+      self.layout().insertWidget(self.layout().count()-1, varrange)
