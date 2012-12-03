@@ -157,7 +157,13 @@
            </widget>
           </item>
           <item>
-           <widget class="QTextEdit" name="pythonScriptTE"/>
+           <widget class="QTextEdit" name="pythonScriptTE">
+            <property name="font">
+             <font>
+              <family>DejaVu Sans Mono</family>
+             </font>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

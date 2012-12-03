@@ -37,7 +37,34 @@ from salome.kernel import termcolor
 logger = Logger("PARAMETRIC", color = termcolor.BLUE)
 logger.setLevel(logging.DEBUG)
 
-from salome.parametric import ParametricStudyEditor
+from salome.parametric import ParametricStudyEditor, ParametricStudy
+
+start_script = """
+from salome.kernel.parametric.pyscript_utils import \
+    create_input_dict, create_normal_parametric_output, create_error_parametric_output
+
+try:
+  globals().update(create_input_dict({}, paramInput))
+  
+  ### Start of user code
+  
+"""
+
+end_script = """  
+  ### End of user code
+
+  output_dict = {}
+  for output_var in paramInput["outputVarList"]:
+    if globals().has_key(output_var):
+      output_dict[output_var] = globals()[output_var]
+    else:
+      raise Exception("User Python script has not created variable %s" % output_var)
+
+  paramOutput = create_normal_parametric_output(output_dict, paramInput)
+
+except Exception, exc:
+  paramOutput = create_error_parametric_output(str(exc))
+"""
 
 class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOME_DriverPy_i):
 
@@ -98,36 +125,49 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       param_input_tc = runtime.getTypeCode("SALOME_TYPES/ParametricInput")
       if param_input_tc is None:
         raise Exception ("Internal error: No typecode found for type 'SALOME_TYPES/ParametricInput'")
-      foreach = pilot.ForEachLoop("ForEach", param_input_tc)
-      foreach.edGetNbOfBranchesPort().edInit(param_study.nb_parallel_computations)
-      proc.edAddChild(foreach)
-
-      solver_code = param_study.salome_component_name
-      solver_compo_inst = proc.createComponentInstance(solver_code)
-      solver_compo_def = self.session_catalog._componentMap[solver_code]
-      
-      distrib_container = proc.createContainer("DistribContainer")
-      distrib_container.setProperty("hostname", "localhost")
-      solver_compo_inst.setContainer(distrib_container)
-
-      init_solver = solver_compo_def._serviceMap["Init"].clone(None)
-      init_solver.setComponent(solver_compo_inst)
-      init_solver.getInputPort("studyID").edInit(studyId)
-      entry = self._parse_entry(param_study.solver_case_entry)
-      init_solver.getInputPort("detCaseEntry").edInit(entry)
-      foreach.edSetInitNode(init_solver)
-
-      exec_solver = solver_compo_def._serviceMap["Exec"].clone(None)
-      exec_solver.setComponent(solver_compo_inst)
-      foreach.edSetNode(exec_solver)
-
-      finalize_solver = solver_compo_def._serviceMap["Finalize"].clone(None)
-      finalize_solver.setComponent(solver_compo_inst)
-      foreach.edSetFinalizeNode(finalize_solver)
-
       param_output_tc = runtime.getTypeCode("SALOME_TYPES/ParametricOutput")
       if param_output_tc is None:
         raise Exception ("Internal error: No typecode found for type 'SALOME_TYPES/ParametricOutput'")
+      foreach = pilot.ForEachLoop("ForEach", param_input_tc)
+      foreach.edGetNbOfBranchesPort().edInit(param_study.nb_parallel_computations)
+      proc.edAddChild(foreach)
+      
+      distrib_container = proc.createContainer("DistribContainer")
+      distrib_container.setProperty("hostname", "localhost")
+
+      if param_study.solver_code_type == ParametricStudy.SALOME_COMPONENT:
+        solver_code = param_study.salome_component_name
+        solver_compo_inst = proc.createComponentInstance(solver_code)
+        solver_compo_def = self.session_catalog._componentMap[solver_code]
+        solver_compo_inst.setContainer(distrib_container)
+  
+        init_solver = solver_compo_def._serviceMap["Init"].clone(None)
+        init_solver.setComponent(solver_compo_inst)
+        init_solver.getInputPort("studyID").edInit(studyId)
+        entry = self._parse_entry(param_study.solver_case_entry)
+        init_solver.getInputPort("detCaseEntry").edInit(entry)
+        foreach.edSetInitNode(init_solver)
+  
+        exec_solver = solver_compo_def._serviceMap["Exec"].clone(None)
+        exec_solver.setComponent(solver_compo_inst)
+        foreach.edSetNode(exec_solver)
+  
+        finalize_solver = solver_compo_def._serviceMap["Finalize"].clone(None)
+        finalize_solver.setComponent(solver_compo_inst)
+        foreach.edSetFinalizeNode(finalize_solver)
+      else:
+        exec_solver = runtime.createScriptNode(SALOMERuntime.PythonNode.KIND, "Exec")
+        exec_solver.edAddInputPort("paramInput", param_input_tc)
+        exec_solver.edAddOutputPort("paramOutput", param_output_tc)
+        indented_user_script = ""
+        for line in param_study.python_script.splitlines():
+          indented_user_script += "  " + line + "\n"
+        exec_script = start_script + indented_user_script + end_script
+        exec_solver.setScript(exec_script)
+        exec_solver.setExecutionMode("remote")
+        exec_solver.setContainer(distrib_container)
+        foreach.edSetNode(exec_solver)
+
       seq_param_output_tc = proc.createSequenceTc("", "seq_param_output", param_output_tc)
       aggregator = runtime.createScriptNode(SALOMERuntime.PythonNode.KIND, "Aggregator")
       aggregator_input_port = aggregator.edAddInputPort("results", seq_param_output_tc)
