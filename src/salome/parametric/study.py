@@ -60,15 +60,19 @@ class ParametricStudyEditor:
   def _set_sobj(self, parametric_study, sobj):
     self.editor.setItem(sobj,
                         name = parametric_study.name,
-                        comment = cPickle.dumps(parametric_study),
                         icon = PARAM_STUDY_ICON,
                         typeId = PARAM_STUDY_TYPE_ID)
+    attr = self.editor.builder.FindOrCreateAttribute(sobj, "AttributeParameter")
+    attr.SetString("study", cPickle.dumps(parametric_study))
 
   def get_parametric_study(self, entry):
     sobj = self.editor.study.FindObjectID(entry)
     if sobj is None or self.editor.getTypeId(sobj) != PARAM_STUDY_TYPE_ID:
       raise Exception("No valid parametric study at entry %s" % entry)
-    param_study = cPickle.loads(sobj.GetComment())
+    found, attr = self.editor.builder.FindAttribute(sobj, "AttributeParameter")
+    if not found:
+      raise Exception("No valid parametric study at entry %s" % entry)
+    param_study = cPickle.loads(attr.GetString("study"))
     param_study.entry = entry
     return param_study
 
