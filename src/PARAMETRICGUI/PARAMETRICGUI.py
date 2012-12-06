@@ -34,7 +34,7 @@ logger = Logger("PARAMETRICGUI", color = termcolor.GREEN_FG)
 #logger.setLevel(logging.ERROR)
 
 import PARAMETRIC
-from salome.parametric.gui import MainPanel
+from salome.parametric.gui import MainPanel, GenJobDialog
 from salome.parametric import ParametricStudyEditor
 
 ################################################
@@ -44,11 +44,12 @@ from salome.parametric import ParametricStudyEditor
 
 class GUIcontext:
   # menus/toolbars/actions IDs
-  PARAMETRIC_MENU = 0
-  CREATE_PARAMETRIC_STUDY = 1
-  RUN_PARAMETRIC_STUDY = 2
-  EXPORT_DATA_TO_CSV = 3
-  EDIT_PARAMETRIC_STUDY = 4
+  PARAMETRIC_MENU = 8950
+  CREATE_PARAMETRIC_STUDY = 8951
+  RUN_PARAMETRIC_STUDY = 8952
+  EXPORT_DATA_TO_CSV = 8953
+  EDIT_PARAMETRIC_STUDY = 8954
+  GENERATE_JOB = 8955
 
   # constructor
   def __init__( self ):
@@ -83,6 +84,12 @@ class GUIcontext:
                         "Edit parametric study",
                         "Edit the selected parametric study",
                         "edit_param_study.png")
+
+    sgPyQt.createAction(GUIcontext.GENERATE_JOB,
+                        "Generate batch job",
+                        "Generate batch job",
+                        "Generate a batch job to run the selected parametric study",
+                        "generate_job.png")
 
 ################################################
 # Global variables
@@ -154,6 +161,7 @@ def createPopupMenu(popup, context):
     if selectedType == salome.parametric.study.PARAM_STUDY_TYPE_ID:
       popup.addAction(sgPyQt.action(GUIcontext.EDIT_PARAMETRIC_STUDY))
       popup.addAction(sgPyQt.action(GUIcontext.RUN_PARAMETRIC_STUDY))
+      popup.addAction(sgPyQt.action(GUIcontext.GENERATE_JOB))
       popup.addAction(sgPyQt.action(GUIcontext.EXPORT_DATA_TO_CSV))
 
 # process GUI action
@@ -177,9 +185,8 @@ def new_study():
   panel.new_study()
 
 def edit_study():
-  study_id = sgPyQt.getStudyId()
   entry = salome.sg.getSelected(0)
-  ed = ParametricStudyEditor(study_id)
+  ed = ParametricStudyEditor()
   panel = MainPanel()
   panel.edit_study(ed.get_parametric_study(entry))
 
@@ -226,10 +233,17 @@ def export_to_csv():
         qapp.translate("export_to_csv", "Error"),
         qapp.translate("export_to_csv", "Export to CSV file failed: %s" % exc))
 
+def generate_job():
+  entry = salome.sg.getSelected(0)
+  ed = ParametricStudyEditor()
+  dialog = GenJobDialog(sgPyQt.getDesktop(), ed.get_parametric_study(entry))
+  dialog.exec_()
+
 # ----------------------- #
 dict_command = {
   GUIcontext.CREATE_PARAMETRIC_STUDY: new_study,
   GUIcontext.RUN_PARAMETRIC_STUDY: run_study,
   GUIcontext.EXPORT_DATA_TO_CSV: export_to_csv,
-  GUIcontext.EDIT_PARAMETRIC_STUDY: edit_study
+  GUIcontext.EDIT_PARAMETRIC_STUDY: edit_study,
+  GUIcontext.GENERATE_JOB: generate_job
 }

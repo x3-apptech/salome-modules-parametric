@@ -16,5 +16,7 @@
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 import mainpanel
+import genjob
 
 MainPanel = mainpanel.MainPanel
+GenJobDialog = genjob.GenJobDialog

@@ -16,7 +16,10 @@
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 import study
+import genjob
 
 ParametricStudy = study.ParametricStudy
 ParametricVariable = study.ParametricVariable
 ParametricStudyEditor = study.ParametricStudyEditor
+generate_job = genjob.generate_job
+parse_entry = genjob.parse_entry

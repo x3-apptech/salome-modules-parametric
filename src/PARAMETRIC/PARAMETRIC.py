@@ -19,7 +19,6 @@ import logging
 import threading
 import inspect
 import traceback
-import re
 import copy
 
 import salome
@@ -29,7 +28,6 @@ import PARAMETRIC_ORB__POA
 from SALOME_ComponentPy import SALOME_ComponentPy_i
 from SALOME_DriverPy import SALOME_DriverPy_i
 import SALOMERuntime
-import loader
 import pilot
 
 from salome.kernel.logger import Logger
@@ -37,7 +35,7 @@ from salome.kernel import termcolor
 logger = Logger("PARAMETRIC", color = termcolor.BLUE)
 logger.setLevel(logging.DEBUG)
 
-from salome.parametric import ParametricStudyEditor, ParametricStudy
+from salome.parametric import ParametricStudyEditor, ParametricStudy, parse_entry
 
 start_script = """
 from salome.kernel.parametric.pyscript_utils import \
@@ -97,16 +95,6 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       self.salome_runtime.addCatalog(self.session_catalog)
     return self.salome_runtime
 
-  def _parse_entry(self, selected_value):
-    """
-    Find entry if selected_value is something like "name (entry)"
-    """
-    entry = selected_value
-    match = re.search("\((.*)\)$", entry)
-    if match is not None:
-      entry = match.group(1)
-    return entry
-
   def RunStudy(self, studyId, caseEntry):
     try:
       self.beginService("PARAMETRIC.RunStudy")
@@ -144,7 +132,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
         init_solver = solver_compo_def._serviceMap["Init"].clone(None)
         init_solver.setComponent(solver_compo_inst)
         init_solver.getInputPort("studyID").edInit(studyId)
-        entry = self._parse_entry(param_study.solver_case_entry)
+        entry = parse_entry(param_study.solver_case_entry)
         init_solver.getInputPort("detCaseEntry").edInit(entry)
         foreach.edSetInitNode(init_solver)
   
