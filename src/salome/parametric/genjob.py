@@ -52,9 +52,13 @@ def generate_job(param_study, result_study_file_name, result_dir, resource):
   # Save Salome study
   ed = getStudyEditor()
   name_wo_space = param_study.name.replace(" ", "_")
-  (fd, input_study) = tempfile.mkstemp(prefix = name_wo_space + "_Input_", suffix = ".hdf")
-  os.close(fd)
-  salome.myStudyManager.SaveAs(input_study, ed.study, False)
+  if ed.study._get_IsSaved():
+    input_study = ed.study._get_Name()
+    salome.myStudyManager.Save(ed.study, False)
+  else:
+    (fd, input_study) = tempfile.mkstemp(prefix = name_wo_space + "_", suffix = ".hdf")
+    os.close(fd)
+    salome.myStudyManager.SaveAs(input_study, ed.study, False)
 
   # Generate job script
   job_script = job_script_template % {"input_study": os.path.basename(input_study),

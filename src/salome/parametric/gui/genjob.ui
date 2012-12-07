@@ -67,6 +67,14 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Please note that your Salome study will automatically be saved when the job is generated.
+Remember to make a copy before if you don't want to overwrite your study.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
