@@ -21,4 +21,10 @@
 Parametric module documentation
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-This documentation covers the usage of Parametric module in Salome.
+This module is still experimental in Salome 6.6 and is not documented yet.
+Documentation and full support will be available in Salome 7.
+
+In particular, please note that the persistence format is not final yet. This
+means that you will not be able to reuse the Parametric Studies created with
+Salome 6.6 in future versions. Be sure to export your results in CSV files
+before migrating to Salome 7.
