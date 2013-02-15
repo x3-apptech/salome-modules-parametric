@@ -34,9 +34,10 @@ SET(CMAKE_MODULE_PATH ${KERNEL_ROOT_DIR}/salome_adm/cmake_files
                       ${GUI_ROOT_DIR}/adm_local/cmake_files)
 
 FIND_PACKAGE(OMNIORB)
-FIND_PACKAGE(PYTHON)
-FIND_PACKAGE(SPHINX)
-FIND_PACKAGE(SIPPYQT)
+FIND_PACKAGE(SalomePYTHON)
+FIND_PACKAGE(SalomeSPHINX)
+FIND_PACKAGE(SalomeSIP)
+FIND_PACKAGE(SalomePYQT4)
 
 SET(BINDIR bin/salome)
 SET(RESDIR share/salome/resources/parametric)
