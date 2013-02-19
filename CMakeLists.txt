@@ -42,7 +42,7 @@ FIND_PACKAGE(SalomePYQT4)
 SET(BINDIR bin/salome)
 SET(RESDIR share/salome/resources/parametric)
 SET(LIBDIR lib/salome)
-SET(PYTHONDIR lib/python${PYTHON_VERSION}/site-packages/salome)
+SET(PYTHONDIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/salome)
 SET(DOCDIR share/doc/salome/gui/PARAMETRIC)
 
 ADD_SUBDIRECTORY(idl)
