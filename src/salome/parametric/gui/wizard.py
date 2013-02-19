@@ -94,31 +94,34 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     self.exec_params_frame.set_pyscript_label_from_vars(exchange_vars)
 
   def validate(self):
-    if not self.step_frames[self.curstep].check_values():
-      return
-    param_study = ParametricStudy()
-    # Input variables
-    for (name, range_widget) in self.define_values_frame.varwidgets.iteritems():
-      minval = range_widget.fromSpinBox.value()
-      maxval = range_widget.toSpinBox.value()
-      step = range_widget.stepSpinBox.value()
-      var = ParametricVariable(name, minval, maxval, step)
-      param_study.add_input_variable(var)
-    # Output variables
-    exch_vars = self.select_vars_frame.getSelectedExchangeVariables()
-    for outvar in exch_vars.outputVarList:
-      param_study.add_output_variable(outvar.name)
-    # Execution parameters
-    self.exec_params_frame.gui_to_study(param_study)
-
-    # Save to Salome study
-    ed = ParametricStudyEditor()
-    if self.entry is not None:
-      ed.set_parametric_study_at_entry(param_study, self.entry)
-    else:
-      ed.add_parametric_study(param_study)
-    salome.sg.updateObjBrowser(0)
-    self.close()
+    try:
+      if not self.step_frames[self.curstep].check_values():
+        return
+      param_study = ParametricStudy()
+      # Input variables
+      for (name, range_widget) in self.define_values_frame.varwidgets.iteritems():
+        minval = range_widget.fromSpinBox.value()
+        maxval = range_widget.toSpinBox.value()
+        step = range_widget.stepSpinBox.value()
+        var = ParametricVariable(name, minval, maxval, step)
+        param_study.add_input_variable(var)
+      # Output variables
+      exch_vars = self.select_vars_frame.getSelectedExchangeVariables()
+      for outvar in exch_vars.outputVarList:
+        param_study.add_output_variable(outvar.name)
+      # Execution parameters
+      self.exec_params_frame.gui_to_study(param_study)
+  
+      # Save to Salome study
+      ed = ParametricStudyEditor()
+      if self.entry is not None:
+        ed.set_parametric_study_at_entry(param_study, self.entry)
+      else:
+        ed.add_parametric_study(param_study)
+      salome.sg.updateObjBrowser(0)
+      self.close()
+    except Exception, exc:
+      QtGui.QMessageBox.critical(self, self.tr("Error"), str(exc))
 
   def set_study(self, param_study):
     self.entry = param_study.entry

@@ -26,7 +26,21 @@ module PARAMETRIC_ORB
 
 interface PARAMETRIC_Gen : Engines::EngineComponent, SALOMEDS::Driver
 {
-    void RunStudy(in long studyID, in SALOMEDS::ID caseEntry)
+    void AddParametricStudy(in Engines::fileBlock parametricStudy,
+                            in long salomeStudyID)
+      raises (SALOME::SALOME_Exception);
+
+    void SetParametricStudy(in Engines::fileBlock parametricStudy,
+                            in long salomeStudyID,
+                            in SALOMEDS::ID entry)
+      raises (SALOME::SALOME_Exception);
+
+    Engines::fileBlock GetParametricStudy(in long salomeStudyID,
+                                          in SALOMEDS::ID entry)
+      raises (SALOME::SALOME_Exception);
+
+    void RunStudy(in long salomeStudyID,
+                  in SALOMEDS::ID entry)
       raises (SALOME::SALOME_Exception);
 };
 

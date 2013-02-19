@@ -18,6 +18,7 @@
 import study
 import genjob
 
+PARAM_STUDY_TYPE_ID = study.PARAM_STUDY_TYPE_ID
 ParametricStudy = study.ParametricStudy
 ParametricVariable = study.ParametricVariable
 ParametricStudyEditor = study.ParametricStudyEditor

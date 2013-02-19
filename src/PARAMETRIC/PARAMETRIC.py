@@ -20,6 +20,7 @@ import threading
 import inspect
 import traceback
 import copy
+import cPickle
 
 import salome
 import SALOME
@@ -30,12 +31,21 @@ from SALOME_DriverPy import SALOME_DriverPy_i
 import SALOMERuntime
 import pilot
 
+from salome.kernel.studyedit import getStudyEditor
 from salome.kernel.logger import Logger
 from salome.kernel import termcolor
 logger = Logger("PARAMETRIC", color = termcolor.BLUE)
 logger.setLevel(logging.DEBUG)
 
-from salome.parametric import ParametricStudyEditor, ParametricStudy, parse_entry
+from salome.parametric import PARAM_STUDY_TYPE_ID, ParametricStudy, parse_entry
+
+# module constants
+MODULE_NAME = "PARAMETRIC"
+
+COMPONENT_NAME = "Parametric"
+COMPONENT_ICON = "PARAMETRIC_small.png"
+
+PARAM_STUDY_ICON = "param_study.png"
 
 start_script = """
 from salome.kernel.parametric.pyscript_utils import \
@@ -71,6 +81,8 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
   def __init__(self, orb, poa, contID, containerName, instanceName, interfaceName):
     SALOME_ComponentPy_i.__init__(self, orb, poa, contID, containerName, instanceName, interfaceName, 0)
     SALOME_DriverPy_i.__init__(self, interfaceName)
+    self.param_comp = {}
+    self.param_study_dict = {}
     self.salome_runtime = None
     self.session_catalog = None
 
@@ -81,6 +93,66 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
     exc = SALOME.ExceptionStruct(SALOME.INTERNAL_ERROR, message,
                                  inspect.stack()[1][1], inspect.stack()[1][2])
     raise SALOME.SALOME_Exception(exc)
+
+  def _find_or_create_param_component(self, salomeStudyID):
+    """
+    Find the component "Parametric" or create it if none is found
+    :return: the SComponent found or created.
+    """
+    if salomeStudyID not in self.param_comp:
+      ed = getStudyEditor(salomeStudyID)
+      self.param_comp[salomeStudyID] = ed.findOrCreateComponent(MODULE_NAME, COMPONENT_NAME, COMPONENT_ICON)
+    return self.param_comp[salomeStudyID]
+
+  def _set_param_study_sobj(self, parametric_study, salomeStudyID, sobj):
+    getStudyEditor(salomeStudyID).setItem(sobj,
+                                          name = parametric_study.name,
+                                          icon = PARAM_STUDY_ICON,
+                                          typeId = PARAM_STUDY_TYPE_ID)
+    if salomeStudyID not in self.param_study_dict:
+      self.param_study_dict[salomeStudyID] = {}
+    entry = sobj.GetID()
+    self.param_study_dict[salomeStudyID][entry] = parametric_study
+
+  def AddParametricStudy(self, parametricStudy, salomeStudyID):
+    try:
+      self.beginService("PARAMETRIC.AddParametricStudy")
+      param_study = cPickle.loads(parametricStudy)
+      param_comp = self._find_or_create_param_component(salomeStudyID)
+      sobj = getStudyEditor(salomeStudyID).createItem(param_comp, "__NEW_STUDY__")
+      self._set_param_study_sobj(param_study, salomeStudyID, sobj)
+      self.endService("PARAMETRIC.AddParametricStudy")
+    except:
+      self._raiseSalomeError()
+
+  def _set_parametric_study(self, param_study, salomeStudyID, entry):
+    sobj = getStudyEditor(salomeStudyID).study.FindObjectID(entry)
+    self._set_param_study_sobj(param_study, salomeStudyID, sobj)
+
+  def SetParametricStudy(self, parametricStudy, salomeStudyID, entry):
+    try:
+      self.beginService("PARAMETRIC.SetParametricStudy")
+      param_study = cPickle.loads(parametricStudy)
+      self._set_parametric_study(param_study, salomeStudyID, entry)
+      self.endService("PARAMETRIC.SetParametricStudy")
+    except:
+      self._raiseSalomeError()
+
+  def _get_parametric_study(self, salomeStudyID, entry):
+    if salomeStudyID not in self.param_study_dict or entry not in self.param_study_dict[salomeStudyID]:
+      raise Exception("No valid parametric study at entry %s" % entry)
+    param_study = self.param_study_dict[salomeStudyID][entry]
+    param_study.entry = entry
+    return param_study
+
+  def GetParametricStudy(self, salomeStudyID, entry):
+    try:
+      self.beginService("PARAMETRIC.GetParametricStudy")
+      param_study = self._get_parametric_study(salomeStudyID, entry)
+      return cPickle.dumps(param_study)
+      self.endService("PARAMETRIC.GetParametricStudy")
+    except:
+      self._raiseSalomeError()
 
   def _get_salome_runtime(self):
     if self.salome_runtime is None:
@@ -95,7 +167,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       self.salome_runtime.addCatalog(self.session_catalog)
     return self.salome_runtime
 
-  def RunStudy(self, studyId, caseEntry):
+  def RunStudy(self, salomeStudyID, entry):
     try:
       self.beginService("PARAMETRIC.RunStudy")
 
@@ -104,8 +176,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       PARAMETRIC.lock.release()
       
       # Get parametric study from the case in Salome study
-      ed = ParametricStudyEditor(studyId)
-      param_study = ed.get_parametric_study(caseEntry)
+      param_study = self._get_parametric_study(salomeStudyID, entry)
 
       # Generate YACS schema
       runtime = self._get_salome_runtime()
@@ -131,9 +202,9 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
   
         init_solver = solver_compo_def._serviceMap["Init"].clone(None)
         init_solver.setComponent(solver_compo_inst)
-        init_solver.getInputPort("studyID").edInit(studyId)
-        entry = parse_entry(param_study.solver_case_entry)
-        init_solver.getInputPort("detCaseEntry").edInit(entry)
+        init_solver.getInputPort("studyID").edInit(salomeStudyID)
+        solver_case_entry = parse_entry(param_study.solver_case_entry)
+        init_solver.getInputPort("detCaseEntry").edInit(solver_case_entry)
         foreach.edSetInitNode(init_solver)
   
         exec_solver = solver_compo_def._serviceMap["Exec"].clone(None)
@@ -229,7 +300,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
           param_study.data["__ERROR_MESSAGE__"].append(result["errorMessage"])
 
       # Save results in Salome study
-      ed.set_parametric_study_at_entry(param_study, caseEntry)
+      self._set_parametric_study(param_study, salomeStudyID, entry)
 
       self.endService("PARAMETRIC.RunStudy")
     except:

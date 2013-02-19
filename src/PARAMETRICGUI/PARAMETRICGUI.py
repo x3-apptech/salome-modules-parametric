@@ -194,10 +194,10 @@ def run_study():
   qapp = QtGui.QApplication
   try:
     qapp.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-    study_id = sgPyQt.getStudyId()
+    ed = ParametricStudyEditor()
     entry = salome.sg.getSelected(0)
-    engine = salome.lcc.FindOrLoadComponent("ParametricContainer", "PARAMETRIC")
-    engine.RunStudy(study_id, entry)
+    engine = ed.find_or_create_engine()
+    engine.RunStudy(ed.study_id, entry)
     qapp.restoreOverrideCursor()
   except SALOME.SALOME_Exception, exc:
     qapp.restoreOverrideCursor()

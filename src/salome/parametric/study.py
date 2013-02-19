@@ -18,15 +18,11 @@
 import cPickle
 import numpy
 
-from salome.kernel.studyedit import getStudyEditor
+import salome
+import SALOME
+from salome.kernel.studyedit import getActiveStudyId
+import PARAMETRIC
 
-# module constants
-MODULE_NAME = "PARAMETRIC"
-
-COMPONENT_NAME = "Parametric"
-COMPONENT_ICON = "PARAMETRIC_small.png"
-
-PARAM_STUDY_ICON = "param_study.png"
 PARAM_STUDY_TYPE_ID = 1
 
 class ParametricStudyEditor:
@@ -36,44 +32,43 @@ class ParametricStudyEditor:
   it is :const:`None`, the edited study will be the current study.
   """
   def __init__(self, study_id = None):
-    self.editor = getStudyEditor(study_id)
-    self.param_comp = None
+    self.study_id = study_id
+    if self.study_id is None:
+      self.study_id = getActiveStudyId()
+    self.engine = None
 
-  def find_or_create_param_component(self):
+  def find_or_create_engine(self):
     """
-    Find the component "Parametric" or create it if none is found
-    :return: the SComponent found or created.
+    Find the engine "PARAMETRIC" or create it if none is found
+    :return: the PARAMETRIC engine
     """
-    if self.param_comp is None:
-      self.param_comp = self.editor.findOrCreateComponent(MODULE_NAME, COMPONENT_NAME, COMPONENT_ICON)
-    return self.param_comp
+    if self.engine is None:
+      self.engine = salome.lcc.FindOrLoadComponent("FactoryServer", "PARAMETRIC")
+    return self.engine
 
   def add_parametric_study(self, parametric_study):
-    self.find_or_create_param_component()
-    sobj = self.editor.createItem(self.param_comp, "__NEW_STUDY__")
-    self._set_sobj(parametric_study, sobj)
+    engine = self.find_or_create_engine()
+    pickled_param_study = cPickle.dumps(parametric_study)
+    try:
+      engine.AddParametricStudy(pickled_param_study, self.study_id)
+    except SALOME.SALOME_Exception, exc:
+      raise Exception(exc.details.text)
 
   def set_parametric_study_at_entry(self, parametric_study, entry):
-    sobj = self.editor.study.FindObjectID(entry)
-    self._set_sobj(parametric_study, sobj)
-
-  def _set_sobj(self, parametric_study, sobj):
-    self.editor.setItem(sobj,
-                        name = parametric_study.name,
-                        icon = PARAM_STUDY_ICON,
-                        typeId = PARAM_STUDY_TYPE_ID)
-    attr = self.editor.builder.FindOrCreateAttribute(sobj, "AttributeParameter")
-    attr.SetString("study", cPickle.dumps(parametric_study))
+    engine = self.find_or_create_engine()
+    pickled_param_study = cPickle.dumps(parametric_study)
+    try:
+      engine.SetParametricStudy(pickled_param_study, self.study_id, entry)
+    except SALOME.SALOME_Exception, exc:
+      raise Exception(exc.details.text)
 
   def get_parametric_study(self, entry):
-    sobj = self.editor.study.FindObjectID(entry)
-    if sobj is None or self.editor.getTypeId(sobj) != PARAM_STUDY_TYPE_ID:
-      raise Exception("No valid parametric study at entry %s" % entry)
-    found, attr = self.editor.builder.FindAttribute(sobj, "AttributeParameter")
-    if not found:
-      raise Exception("No valid parametric study at entry %s" % entry)
-    param_study = cPickle.loads(attr.GetString("study"))
-    param_study.entry = entry
+    engine = self.find_or_create_engine()
+    try:
+      pickled_param_study = engine.GetParametricStudy(self.study_id, entry)
+    except SALOME.SALOME_Exception, exc:
+      raise Exception(exc.details.text)
+    param_study = cPickle.loads(pickled_param_study)
     return param_study
 
 
