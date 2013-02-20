@@ -185,10 +185,15 @@ def new_study():
   panel.new_study()
 
 def edit_study():
-  entry = salome.sg.getSelected(0)
-  ed = ParametricStudyEditor()
-  panel = MainPanel()
-  panel.edit_study(ed.get_parametric_study(entry))
+  try:
+    entry = salome.sg.getSelected(0)
+    ed = ParametricStudyEditor()
+    panel = MainPanel()
+    panel.edit_study(ed.get_parametric_study(entry))
+  except Exception, exc:
+    logger.exception("Error while trying to edit parametric study")
+    qapp = QtGui.QApplication
+    QtGui.QMessageBox.critical(sgPyQt.getDesktop(), qapp.translate("edit_study", "Error"), str(exc))
 
 def run_study():
   qapp = QtGui.QApplication

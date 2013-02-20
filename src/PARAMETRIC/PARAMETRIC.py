@@ -21,6 +21,8 @@ import inspect
 import traceback
 import copy
 import cPickle
+import tempfile
+import os
 
 import salome
 import SALOME
@@ -38,6 +40,7 @@ logger = Logger("PARAMETRIC", color = termcolor.BLUE)
 logger.setLevel(logging.DEBUG)
 
 from salome.parametric import PARAM_STUDY_TYPE_ID, ParametricStudy, parse_entry
+from salome.parametric.persistence import load_param_study_dict, save_param_study_dict
 
 # module constants
 MODULE_NAME = "PARAMETRIC"
@@ -305,3 +308,42 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       self.endService("PARAMETRIC.RunStudy")
     except:
       self._raiseSalomeError()
+
+  def Save(self, theComponent, theURL, isMultiFile):
+    try:
+      # Select parametric studies to save
+      salomeStudyID = theComponent.GetStudy()._get_StudyId()
+      componentEntry = theComponent.GetID()
+      dict_to_save = {}
+      if salomeStudyID in self.param_study_dict:
+        for (entry, param_study) in self.param_study_dict[salomeStudyID].iteritems():
+          if entry.startswith(componentEntry):
+            dict_to_save[entry] = param_study
+      
+      if len(dict_to_save) > 0:
+        # Save parametric studies in temporary file
+        (fd, filename) = tempfile.mkstemp(prefix = "PARAMETRIC_", suffix = ".hdf")
+        os.close(fd)
+        save_param_study_dict(dict_to_save, filename)
+        
+        # Return the content of the temporary file as a byte sequence
+        with open(filename) as f:
+          buf = f.read()
+        
+        # Delete the temporary file
+        #os.remove(filename)
+        
+        return buf
+      else:
+        return ""
+    except:
+      logger.exception("Error while trying to save study")
+      return ""
+
+  def Load(self, theComponent, theStream, theURL, isMultiFile):
+    try:
+      print "PARAMETRIC load"
+      return 1
+    except:
+      logger.exception("Error while trying to load study")
+      return 0
