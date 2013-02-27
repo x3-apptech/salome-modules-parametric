@@ -89,7 +89,8 @@ class ExecParamsFrame(QtGui.QWidget, Ui_ExecParams):
     if param_study.solver_code_type == ParametricStudy.SALOME_COMPONENT:
       self.salomeComponentRB.setChecked(True)
       self.componentNameLE.setText(param_study.salome_component_name)
-      self.set_case_entry(param_study.solver_case_entry)
+      if param_study.solver_case_entry is not None:
+        self.set_case_entry(param_study.solver_case_entry)
     else:
       self.pythonScriptRB.setChecked(True)
       self.pythonScriptTE.setText(param_study.python_script)
