@@ -331,7 +331,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
           buf = f.read()
         
         # Delete the temporary file
-        #os.remove(filename)
+        os.remove(filename)
         
         return buf
       else:
@@ -342,7 +342,30 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
 
   def Load(self, theComponent, theStream, theURL, isMultiFile):
     try:
-      print "PARAMETRIC load"
+      if len(theStream) == 0:
+        return 1
+      
+      # Save the stream in a temporary file
+      (fd, filename) = tempfile.mkstemp(prefix = "PARAMETRIC_", suffix = ".hdf")
+      os.close(fd)
+      with open(filename, "w") as f:
+        f.write(theStream)
+
+      # Load param studies dictionary
+      loaded_dict = load_param_study_dict(filename)
+      
+      # Delete the temporary file
+      os.remove(filename)
+      
+      # Update param study dictionary with loaded dict
+      salomeStudyID = theComponent.GetStudy()._get_StudyId()
+      componentEntry = theComponent.GetID()
+      if salomeStudyID not in self.param_study_dict:
+        self.param_study_dict[salomeStudyID] = {}
+        for (entry, param_study) in loaded_dict.iteritems():
+          if entry.startswith(componentEntry):
+            self.param_study_dict[salomeStudyID][entry] = param_study
+      print self.param_study_dict
       return 1
     except:
       logger.exception("Error while trying to load study")
