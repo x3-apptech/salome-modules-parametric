@@ -65,6 +65,8 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
       self.step()
 
   def step(self):
+    if self.step_methods[self.curstep] is not None:
+      self.step_methods[self.curstep](self)
     for i in range(len(self.step_texts)):
       if i == self.curstep:
         self.step_labels[i].setText("<b>" + self.tr(self.step_texts[i]) + "</b>")
@@ -82,8 +84,6 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
     else:
       self.nextButton.show()
       self.OKButton.hide()
-    if self.step_methods[self.curstep] is not None:
-      self.step_methods[self.curstep](self)
 
   def define_values(self):
     exchange_vars = self.select_vars_frame.getSelectedExchangeVariables()
