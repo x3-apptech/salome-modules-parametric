@@ -17,7 +17,7 @@
 
 import h5py
 
-from study import ParametricStudy, ParametricVariable
+from study import ParametricStudy, VariableRange
 
 def save_param_study_dict(param_study_dict, filename):
   with h5py.File(filename, "w") as f:
@@ -29,18 +29,28 @@ def save_param_study_dict(param_study_dict, filename):
         param_study_group.attrs["name"] = param_study.name
       
       # Store input and output variables definitions
-      ordered_vars = []
-      input_vars_group = param_study_group.create_group("input_vars")
-      for input_var in param_study.input_vars:
-        ordered_vars.append(input_var.name)
-        var_group = input_vars_group.create_group(input_var.name)
-        var_group.attrs["min"] = input_var.min
-        var_group.attrs["max"] = input_var.max
-        var_group.attrs["step"] = input_var.step
-      output_vars_group = param_study_group.create_group("output_vars")
-      for output_varname in param_study.output_vars:
-        ordered_vars.append(output_varname)
-        var_group = output_vars_group.create_group(output_varname)
+      param_study_group.attrs["input_vars"] = param_study.input_vars
+      param_study_group.attrs["output_vars"] = param_study.output_vars
+
+      # Store sample definition
+      sample_def_group = param_study_group.create_group("sample_definition")
+      if param_study.sample_definition_method == ParametricStudy.SAMPLE_VAR_RANGE:
+        sample_def_group.attrs["sample_definition_method"] = "variables_ranges"
+        if param_study.sample_var_range is not None:
+          var_range_group = sample_def_group.create_group("variables_ranges")
+          for varname, varrange in param_study.sample_var_range.iteritems():
+            var_group = var_range_group.create_group(varname)
+            var_group.attrs["min"] = varrange.min
+            var_group.attrs["max"] = varrange.max
+            var_group.attrs["step"] = varrange.step
+      elif param_study.sample_definition_method == ParametricStudy.SAMPLE_PYTHON_SCRIPT:
+        sample_def_group.attrs["sample_definition_method"] = "python_script"
+        if param_study.sample_python_script is not None:
+          sample_def_group.attrs["python_script"] = param_study.sample_python_script
+      else:
+        sample_def_group.attrs["sample_definition_method"] = "csv_file"
+        if param_study.sample_csv_file is not None:
+          sample_def_group.attrs["csv_file"] = param_study.sample_csv_file
 
       # Store solver definition
       solver_group = param_study_group.create_group("solver")
@@ -61,6 +71,7 @@ def save_param_study_dict(param_study_dict, filename):
 
       # Data
       if param_study.data is not None:
+        ordered_vars = param_study.input_vars + param_study.output_vars
         dset = param_study_group.create_dataset("data", (param_study.datasize, len(ordered_vars)))
         dset.attrs["ordered_vars"] = ordered_vars
         for idx_var, var in enumerate(ordered_vars):
@@ -97,15 +108,27 @@ def _load_param_study_dict_7_2(hdffile):
     param_study.name = param_study_group.attrs.get("name")
 
     # Load input and output variables definitions
-    input_vars_group = param_study_group["input_vars"]
-    for varname, var_group in input_vars_group.iteritems():
-      minval = var_group.attrs["min"]
-      maxval = var_group.attrs["max"]
-      step = var_group.attrs["step"]
-      param_study.add_input_variable(ParametricVariable(str(varname), minval, maxval, step))
-    output_vars_group = param_study_group["output_vars"]
-    for output_varname in output_vars_group.iterkeys():
-      param_study.add_output_variable(str(output_varname))
+    param_study.input_vars = list(param_study_group.attrs["input_vars"])
+    param_study.output_vars = list(param_study_group.attrs["output_vars"])
+
+    # Load sample definition
+    sample_def_group = param_study_group["sample_definition"]
+    if sample_def_group.attrs["sample_definition_method"] == "variables_ranges":
+      param_study.sample_definition_method = ParametricStudy.SAMPLE_VAR_RANGE
+      if "variables_ranges" in sample_def_group:
+        var_range_group = sample_def_group["variables_ranges"]
+        param_study.sample_var_range = {}
+        for varname, var_group in var_range_group.iteritems():
+          minval = var_group.attrs["min"]
+          maxval = var_group.attrs["max"]
+          step = var_group.attrs["step"]
+          param_study.set_variable_range(str(varname), VariableRange(minval, maxval, step))
+    elif sample_def_group.attrs["sample_definition_method"] == "python_script":
+      param_study.sample_definition_method = ParametricStudy.SAMPLE_PYTHON_SCRIPT
+      param_study.sample_python_script = sample_def_group.attrs.get("python_script")
+    else:
+      param_study.sample_definition_method = ParametricStudy.SAMPLE_CSV_FILE
+      param_study.sample_csv_file = sample_def_group.attrs.get("csv_file")
 
     # Load solver definition
     solver_group = param_study_group["solver"]
@@ -119,7 +142,7 @@ def _load_param_study_dict_7_2(hdffile):
 
     # Load execution parameters
     execution_group = param_study_group["execution"]
-    param_study.nb_parallel_computations = execution_group.attrs["nb_parallel_computations"]
+    param_study.nb_parallel_computations = int(execution_group.attrs["nb_parallel_computations"])
 
     # Load data
     if "data" in param_study_group:

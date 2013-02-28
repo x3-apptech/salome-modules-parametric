@@ -64,6 +64,14 @@
         <bool>true</bool>
        </property>
        <widget class="QWidget" name="variablesRangesWidget">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>712</width>
+          <height>76</height>
+         </rect>
+        </property>
         <layout class="QVBoxLayout" name="verticalLayout_3"/>
        </widget>
       </widget>
@@ -72,9 +80,6 @@
    </item>
    <item>
     <widget class="QRadioButton" name="pythonScriptRB">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="text">
       <string>Define sample with a Python script</string>
      </property>
@@ -105,9 +110,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="pyscriptLabel">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="font">
           <font>
            <italic>true</italic>
@@ -120,9 +122,6 @@
        </item>
        <item>
         <widget class="QTextEdit" name="pythonScriptTE">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
          <property name="font">
           <font>
            <family>DejaVu Sans Mono</family>
@@ -136,9 +135,6 @@
    </item>
    <item>
     <widget class="QRadioButton" name="loadSampleRB">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
      <property name="text">
       <string>Load sample from a CSV file</string>
      </property>
@@ -167,26 +163,16 @@
      </item>
      <item>
       <widget class="QLabel" name="label">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
        <property name="text">
         <string>CSV File:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
+      <widget class="QLineEdit" name="csvFileLE"/>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
+      <widget class="QPushButton" name="chooseCsvFileButton">
        <property name="text">
         <string>Choose File...</string>
        </property>

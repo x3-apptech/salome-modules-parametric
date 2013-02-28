@@ -20,7 +20,7 @@ import genjob
 
 PARAM_STUDY_TYPE_ID = study.PARAM_STUDY_TYPE_ID
 ParametricStudy = study.ParametricStudy
-ParametricVariable = study.ParametricVariable
+VariableRange = study.VariableRange
 ParametricStudyEditor = study.ParametricStudyEditor
 generate_job = genjob.generate_job
 parse_entry = genjob.parse_entry

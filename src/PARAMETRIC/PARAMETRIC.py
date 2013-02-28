@@ -245,19 +245,16 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
         param_study.generate_data()
       
       seqsamples = []
-      refsample = {"inputVarList": [],
-                   "outputVarList": [],
+      refsample = {"inputVarList": param_study.input_vars,
+                   "outputVarList": param_study.output_vars,
                    "inputValues": [[[]]],
                    "specificParameters": [],
                   }
-      for varname in param_study.output_vars:
-        refsample["outputVarList"].append(varname)
 
       for i in range(param_study.datasize):
         sample = copy.deepcopy(refsample)
         for var in param_study.input_vars:
-          sample["inputVarList"].append(var.name)
-          sample["inputValues"][0][0].append([param_study.data[var.name][i]])
+          sample["inputValues"][0][0].append([param_study.data[var][i]])
         seqsamples.append(sample)
       foreach.edGetSeqOfSamplesPort().edInitPy(seqsamples)
 

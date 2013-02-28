@@ -25,7 +25,7 @@ from wizard_ui import Ui_Wizard
 from selectvars import SelectVarsFrame
 from definevalues import DefineValuesFrame
 from execparams import ExecParamsFrame
-from salome.parametric import ParametricVariable, ParametricStudy, ParametricStudyEditor
+from salome.parametric import ParametricStudy, ParametricStudyEditor
 
 
 class Wizard(QtGui.QWidget, Ui_Wizard):
@@ -98,19 +98,8 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
       if not self.step_frames[self.curstep].check_values():
         return
       param_study = ParametricStudy()
-      # Input variables
-      for (name, range_widget) in self.define_values_frame.varwidgets.iteritems():
-        minval = range_widget.fromSpinBox.value()
-        maxval = range_widget.toSpinBox.value()
-        step = range_widget.stepSpinBox.value()
-        var = ParametricVariable(name, minval, maxval, step)
-        param_study.add_input_variable(var)
-      # Output variables
-      exch_vars = self.select_vars_frame.getSelectedExchangeVariables()
-      for outvar in exch_vars.outputVarList:
-        param_study.add_output_variable(outvar.name)
-      # Execution parameters
-      self.exec_params_frame.gui_to_study(param_study)
+      for frame in self.step_frames:
+        frame.gui_to_study(param_study)
   
       # Save to Salome study
       ed = ParametricStudyEditor()
@@ -125,9 +114,8 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
 
   def set_study(self, param_study):
     self.entry = param_study.entry
-    self.select_vars_frame.set_vars_from_param_study(param_study)
-    self.define_values_frame.set_ranges_from_param_study(param_study)
-    self.exec_params_frame.study_to_gui(param_study)
+    for frame in self.step_frames:
+      frame.study_to_gui(param_study)
 
   def close(self):
     QtGui.QWidget.close(self)

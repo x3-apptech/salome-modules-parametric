@@ -72,10 +72,9 @@ class ParametricStudyEditor:
     return param_study
 
 
-class ParametricVariable:
+class VariableRange:
 
-  def __init__(self, name, minval = None, maxval = None, step = None):
-    self.name = name
+  def __init__(self, minval = None, maxval = None, step = None):
     self.min = minval
     self.max = maxval
     self.step = step
@@ -85,10 +84,18 @@ class ParametricStudy:
   
   SALOME_COMPONENT = 0
   PYTHON_SCRIPT = 1
+  
+  SAMPLE_VAR_RANGE = 0
+  SAMPLE_PYTHON_SCRIPT = 1
+  SAMPLE_CSV_FILE = 2
 
   def __init__(self):
     self.input_vars = []
     self.output_vars = []
+    self.sample_definition_method = ParametricStudy.SAMPLE_VAR_RANGE
+    self.sample_var_range = None
+    self.sample_python_script = None
+    self.sample_csv_file = None
     self.solver_code_type = ParametricStudy.SALOME_COMPONENT
     self.salome_component_name = None
     self.solver_case_entry = None
@@ -100,31 +107,39 @@ class ParametricStudy:
     self._value_dict = None
     self.entry = None
 
-  def add_input_variable(self, var):
-    self.input_vars.append(var)
-
-  def add_output_variable(self, varname):
-    self.output_vars.append(varname)
+  def set_variable_range(self, varname, varrange):
+    if varname not in self.input_vars:
+      raise Exception('Can\'t define range for variable "%s", which is not an input variable' % varname)
+    if self.sample_var_range is None:
+      self.sample_var_range = {}
+    self.sample_var_range[varname] = varrange
 
   def generate_data(self):
+    if self.sample_definition_method == ParametricStudy.SAMPLE_VAR_RANGE:
+      self.generate_data_complete_sampling()
+    else:
+      raise Exception("This sample definition method is not implemented")
+
+  def generate_data_complete_sampling(self):
     self.data = {}
     self.datasize = 0
-    for var in self.input_vars:
-      self.data[var.name] = []
+    for varname in self.input_vars:
+      self.data[varname] = []
     self._value_dict = {}
-    self._fill_data(self.input_vars)
+    self._fill_data_complete_sampling(self.input_vars)
 
-  def _fill_data(self, remaining_var_list):
+  def _fill_data_complete_sampling(self, remaining_var_list):
     if len(remaining_var_list) == 0:
       for (name, value) in self._value_dict.iteritems():
         self.data[name].append(value)
       self.datasize += 1
     else:
-      var = remaining_var_list[0]
+      varname = remaining_var_list[0]
       next_var_list = remaining_var_list[1:]
-      for value in numpy.arange(var.min, var.max, var.step):
-        self._value_dict[var.name] = value
-        self._fill_data(next_var_list)
+      varrange = self.sample_var_range[varname]
+      for value in numpy.arange(varrange.min, varrange.max, varrange.step):
+        self._value_dict[varname] = value
+        self._fill_data_complete_sampling(next_var_list)
 
   def export_data_to_csv_file(self, filepath, sep = ","):
     if self.data is None:
@@ -132,16 +147,16 @@ class ParametricStudy:
     f = open(filepath, "w")
     
     # Header
-    for invar in self.input_vars:
-      f.write(invar.name + sep)
+    for invarname in self.input_vars:
+      f.write(invarname + sep)
     for outvarname in self.output_vars:
       f.write(outvarname + sep)
     f.write("Error message\n")
     
     # Data
     for i in range(self.datasize):
-      for invar in self.input_vars:
-        f.write(self._format_value(self.data[invar.name][i]) + sep)
+      for invarname in self.input_vars:
+        f.write(self._format_value(self.data[invarname][i]) + sep)
       for outvarname in self.output_vars:
         f.write(self._format_value(self.data[outvarname][i]) + sep)
       f.write(self._format_value(self.data["__ERROR_MESSAGE__"][i]) + "\n")

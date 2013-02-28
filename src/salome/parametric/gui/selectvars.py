@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 
 from salome.kernel.parametric import study_exchange_vars
 from salome.gui.selectvars import MySelectVarsDialog
@@ -27,11 +27,16 @@ class SelectVarsFrame(MySelectVarsDialog):
     self.OKButton.hide()
     self.cancelButton.hide()
 
-  def set_vars_from_param_study(self, param_study):
-    input_var_list = [study_exchange_vars.Variable(var.name) for var in param_study.input_vars]
+  def study_to_gui(self, param_study):
+    input_var_list = [study_exchange_vars.Variable(varname) for varname in param_study.input_vars]
     output_var_list = [study_exchange_vars.Variable(varname) for varname in param_study.output_vars]
     exchange_vars = study_exchange_vars.ExchangeVariables(input_var_list, output_var_list)
     self.setExchangeVariables(exchange_vars)
+
+  def gui_to_study(self, param_study):
+    exch_vars = self.getSelectedExchangeVariables()
+    param_study.input_vars = [invar.name for invar in exch_vars.inputVarList]
+    param_study.output_vars = [outvar.name for outvar in exch_vars.outputVarList]
 
   def check_values(self):
     if self.selectedInputVarListWidget.count() == 0:

@@ -21,8 +21,9 @@ from PyQt4.QtCore import Qt
 from varrange_ui import Ui_VariableRange
 from definevalues_ui import Ui_SampleDefinition
 
+from salome.parametric import ParametricStudy, VariableRange
 
-class VariableRange(QtGui.QWidget, Ui_VariableRange):
+class VariableRangeWidget(QtGui.QWidget, Ui_VariableRange):
 
   def __init__(self, parent = None):
     QtGui.QWidget.__init__(self, parent)
@@ -39,28 +40,52 @@ class DefineValuesFrame(QtGui.QWidget, Ui_SampleDefinition):
 
   def set_variables(self, varlist):
     previous_set = set(self.varwidgets.keys())
-    new_set = set([var.name for var in varlist])
-    var_to_remove = previous_set - new_set
-    var_to_add = new_set - previous_set
+    new_list = [var.name for var in varlist]
+    var_to_remove = previous_set - set(new_list)
     for var in var_to_remove:
       self.variablesRangesWidget.layout().removeWidget(self.varwidgets[var])
       self.varwidgets[var].close()
       del self.varwidgets[var]
-    for var in var_to_add:
-      varrange = VariableRange(self)
-      varrange.nameLabel.setText(var)
-      self.varwidgets[var] = varrange
-      self.variablesRangesWidget.layout().addWidget(varrange)
+    for idx_var, var in enumerate(new_list):
+      if var not in self.varwidgets:
+        range_widget = VariableRangeWidget(self)
+        range_widget.nameLabel.setText(var)
+        self.varwidgets[var] = range_widget
+        self.variablesRangesWidget.layout().insertWidget(idx_var, range_widget)
 
-  def set_ranges_from_param_study(self, param_study):
-    for var in param_study.input_vars:
-      varrange = VariableRange(self)
-      varrange.nameLabel.setText(var.name)
-      varrange.fromSpinBox.setValue(var.min)
-      varrange.toSpinBox.setValue(var.max)
-      varrange.stepSpinBox.setValue(var.step)
-      self.varwidgets[var.name] = varrange
-      self.variablesRangesWidget.layout().addWidget(varrange)
+  def study_to_gui(self, param_study):
+    if param_study.sample_definition_method == ParametricStudy.SAMPLE_VAR_RANGE:
+      self.variableRangeRB.setChecked(True)
+      for varname in param_study.input_vars:
+        varrange = param_study.sample_var_range[varname]
+        range_widget = VariableRangeWidget(self)
+        range_widget.nameLabel.setText(varname)
+        range_widget.fromSpinBox.setValue(varrange.min)
+        range_widget.toSpinBox.setValue(varrange.max)
+        range_widget.stepSpinBox.setValue(varrange.step)
+        self.varwidgets[varname] = range_widget
+        self.variablesRangesWidget.layout().addWidget(range_widget)
+    elif param_study.sample_definition_method == ParametricStudy.SAMPLE_PYTHON_SCRIPT:
+      self.pythonScriptRB.setChecked(True)
+      self.pythonScriptTE.setText(param_study.sample_python_script)
+    else:
+      self.loadSampleRB.setChecked(True)
+      self.csvFileLE.setText(param_study.sample_csv_file)
+
+  def gui_to_study(self, param_study):
+    if self.variableRangeRB.isChecked():
+      param_study.sample_definition_method = ParametricStudy.SAMPLE_VAR_RANGE
+      for (name, range_widget) in self.varwidgets.iteritems():
+        minval = range_widget.fromSpinBox.value()
+        maxval = range_widget.toSpinBox.value()
+        step = range_widget.stepSpinBox.value()
+        param_study.set_variable_range(name, VariableRange(minval, maxval, step))
+    elif self.pythonScriptRB.isChecked():
+      param_study.sample_definition_method = ParametricStudy.SAMPLE_PYTHON_SCRIPT
+      param_study.sample_python_script = str(self.pythonScriptTE.toPlainText())
+    else:
+      param_study.sample_definition_method = ParametricStudy.SAMPLE_CSV_FILE
+      param_study.sample_csv_file = str(self.csvFileLE.text())
 
   def check_values(self):
     return True
