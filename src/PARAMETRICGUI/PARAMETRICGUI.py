@@ -224,13 +224,23 @@ def export_to_csv():
                                                filter = qapp.translate("export_to_csv", "CSV files (*.csv)"))
   if filename is not None and len(filename) > 0:
     try:
-        qapp.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        study_id = sgPyQt.getStudyId()
-        entry = salome.sg.getSelected(0)
-        ed = ParametricStudyEditor(study_id)
-        param_study = ed.get_parametric_study(entry)
-        param_study.export_data_to_csv_file(filename)
-        qapp.restoreOverrideCursor()
+      filename = str(filename)
+      if not filename.endswith(".csv"):
+        filename += ".csv"
+      qapp.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+      study_id = sgPyQt.getStudyId()
+      entry = salome.sg.getSelected(0)
+      ed = ParametricStudyEditor(study_id)
+      engine = ed.find_or_create_engine()
+      engine.ExportToCSV(ed.study_id, entry, filename)
+      qapp.restoreOverrideCursor()
+    except SALOME.SALOME_Exception, exc:
+      qapp.restoreOverrideCursor()
+      logger.exception("An error happened while trying to export to CSV file.")
+      QtGui.QMessageBox.critical(sgPyQt.getDesktop(),
+          qapp.translate("export_to_csv", "Error"),
+          qapp.translate("export_to_csv", "An error happened while trying to "
+                         "export parametric study to CSV file: %s" % exc.details.text))
     except Exception, exc:
       qapp.restoreOverrideCursor()
       logger.exception("Export to CSV file failed")

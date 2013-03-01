@@ -307,6 +307,24 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
     except:
       self._raiseSalomeError()
 
+  def ExportToCSV(self, salomeStudyID, entry, filePath):
+    try:
+      self.beginService("PARAMETRIC.ExportToCSV")
+
+      PARAMETRIC.lock.acquire()
+      salome.salome_init()
+      PARAMETRIC.lock.release()
+
+      # Get parametric study from the case in Salome study
+      param_study = self._get_parametric_study(salomeStudyID, entry)
+      
+      # Export parametric study to CSV file
+      param_study.export_data_to_csv_file(filePath)
+
+      self.endService("PARAMETRIC.ExportToCSV")
+    except:
+      self._raiseSalomeError()
+
   def Save(self, theComponent, theURL, isMultiFile):
     try:
       # Select parametric studies to save
