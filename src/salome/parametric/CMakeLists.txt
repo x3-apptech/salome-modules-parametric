@@ -16,3 +16,12 @@
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 ADD_SUBDIRECTORY(gui)
+
+SET(PYTHON_FILES
+  __init__.py
+  genjob.py
+  persistence.py
+  study.py
+)
+
+INSTALL_AND_COMPILE_PYTHON_FILE("${PYTHON_FILES}" ${PYTHONDIR}/salome/parametric)

@@ -39,6 +39,8 @@ FIND_PACKAGE(SalomeSPHINX)
 FIND_PACKAGE(SalomeSIP)
 FIND_PACKAGE(SalomePYQT4)
 
+INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/SalomeMacros.cmake)
+
 SET(BINDIR bin/salome)
 SET(RESDIR share/salome/resources/parametric)
 SET(LIBDIR lib/salome)

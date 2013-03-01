@@ -15,6 +15,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
+SET(PYTHON_FILES
+  __init__.py
+  definevalues.py
+  execparams.py
+  genjob.py
+  mainpanel.py
+  selectvars.py
+  wizard.py
+)
 SET(PYUIC_FILES wizard_ui.py varrange_ui.py execparams_ui.py genjob_ui.py definevalues_ui.py)
 SET(INSTALL_DIR ${PYTHONDIR}/salome/parametric/gui)
 
@@ -26,7 +35,9 @@ FOREACH(OUTPUT ${PYUIC_FILES})
                      COMMAND ${PYQT_PYUIC_EXECUTABLE} -o ${OUTPUT} ${INPUT}
                      MAIN_DEPENDENCY ${INPUT}
                     )
-  INSTALL(FILES ${OUTPUT} DESTINATION ${INSTALL_DIR})
+  SET(PYTHON_FILES ${PYTHON_FILES} ${OUTPUT})
 ENDFOREACH(OUTPUT ${PYUIC_FILES})
 
 ADD_CUSTOM_TARGET(BUILD_PY_UI_FILES ALL DEPENDS ${PYUIC_FILES})
+
+INSTALL_AND_COMPILE_PYTHON_FILE("${PYTHON_FILES}" ${INSTALL_DIR})
