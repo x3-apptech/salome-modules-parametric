@@ -25,6 +25,10 @@ import PARAMETRIC
 
 PARAM_STUDY_TYPE_ID = 1
 
+# We must use FactoryServerPy for now because it is the one that is used by GUI
+# when automatically loading the engine
+PARAMETRIC_ENGINE_CONTAINER = "FactoryServerPy"
+
 class ParametricStudyEditor:
   """
   This class provides utility methods to edit the component "Parametric" in
@@ -43,7 +47,7 @@ class ParametricStudyEditor:
     :return: the PARAMETRIC engine
     """
     if self.engine is None:
-      self.engine = salome.lcc.FindOrLoadComponent("FactoryServer", "PARAMETRIC")
+      self.engine = salome.lcc.FindOrLoadComponent(PARAMETRIC_ENGINE_CONTAINER, "PARAMETRIC")
     return self.engine
 
   def add_parametric_study(self, parametric_study):

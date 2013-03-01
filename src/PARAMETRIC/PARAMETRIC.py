@@ -39,7 +39,7 @@ from salome.kernel import termcolor
 logger = Logger("PARAMETRIC", color = termcolor.BLUE)
 logger.setLevel(logging.DEBUG)
 
-from salome.parametric import PARAM_STUDY_TYPE_ID, ParametricStudy, parse_entry
+from salome.parametric import PARAM_STUDY_TYPE_ID, ParametricStudy, parse_entry, PARAMETRIC_ENGINE_CONTAINER
 from salome.parametric.persistence import load_param_study_dict, save_param_study_dict
 
 # module constants
@@ -104,7 +104,8 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
     """
     if salomeStudyID not in self.param_comp:
       ed = getStudyEditor(salomeStudyID)
-      self.param_comp[salomeStudyID] = ed.findOrCreateComponent(MODULE_NAME, COMPONENT_NAME, COMPONENT_ICON)
+      self.param_comp[salomeStudyID] = ed.findOrCreateComponent(MODULE_NAME, COMPONENT_NAME,
+                                                                COMPONENT_ICON, PARAMETRIC_ENGINE_CONTAINER)
     return self.param_comp[salomeStudyID]
 
   def _set_param_study_sobj(self, parametric_study, salomeStudyID, sobj):
@@ -362,7 +363,6 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
         for (entry, param_study) in loaded_dict.iteritems():
           if entry.startswith(componentEntry):
             self.param_study_dict[salomeStudyID][entry] = param_study
-      print self.param_study_dict
       return 1
     except:
       logger.exception("Error while trying to load study")
