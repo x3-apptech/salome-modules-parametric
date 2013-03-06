@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4 import QtGui
+from PyQt4 import QtCore, QtGui
 from PyQt4.QtCore import Qt
 
 from varrange_ui import Ui_VariableRange
@@ -36,7 +36,14 @@ class DefineValuesFrame(QtGui.QWidget, Ui_SampleDefinition):
   def __init__(self, parent = None):
     QtGui.QWidget.__init__(self, parent)
     self.setupUi(self)
+    self.connect(self.chooseCsvFileButton, QtCore.SIGNAL("clicked()"), self.choose_csv_file)
     self.varwidgets = {}
+  
+  def choose_csv_file(self):
+    filename = QtGui.QFileDialog.getOpenFileName(self, self.tr("Load data from CSV file"),
+                                                 filter = self.tr("CSV files (*.csv)"))
+    if filename is not None and len(filename) > 0:
+      self.csvFileLE.setText(filename)
 
   def set_variables(self, varlist):
     previous_set = set(self.varwidgets.keys())

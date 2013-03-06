@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import math
 import cPickle
 import numpy
 
@@ -121,6 +123,8 @@ class ParametricStudy:
   def generate_data(self):
     if self.sample_definition_method == ParametricStudy.SAMPLE_VAR_RANGE:
       self.generate_data_complete_sampling()
+    elif self.sample_definition_method == ParametricStudy.SAMPLE_CSV_FILE:
+      self.generate_data_from_csv_file()
     else:
       raise Exception("This sample definition method is not implemented")
 
@@ -144,6 +148,60 @@ class ParametricStudy:
       for value in numpy.arange(varrange.min, varrange.max, varrange.step):
         self._value_dict[varname] = value
         self._fill_data_complete_sampling(next_var_list)
+
+  def generate_data_from_csv_file(self, sep = ","):
+    if self.sample_csv_file is None:
+      raise Exception("CSV file for input data is not defined")
+    if not os.path.isfile(self.sample_csv_file):
+      raise Exception("CSV file for input data %s does not exist" % self.sample_csv_file)
+    with open(self.sample_csv_file, "r") as f:
+      # Header
+      headerline = f.readline()
+      input_var_tokens = headerline.split(sep)
+      missing_vars = set(self.input_vars)
+      extra_vars = []
+      var_list = []
+      for var_token in input_var_tokens:
+        var = var_token.strip()
+        var_list.append(var)
+        if var in missing_vars:
+          missing_vars.remove(var)
+        else:
+          extra_vars.append(var)
+      if len(missing_vars) == 1:
+        raise Exception("Invalid CSV file for input data: Variable %s is missing" % missing_vars.pop())
+      elif len(missing_vars) > 1:
+        missing_vars_str = ""
+        for var in missing_vars:
+          missing_vars_str += var + ", "
+        missing_vars_str = missing_vars_str[:-2] # Remove last comma
+        raise Exception("Invalid CSV file for input data: Variables %s are missing" % missing_vars_str)
+      if len(extra_vars) == 1:
+        raise Exception("Invalid CSV file for input data: File contains an extra variable %s" % extra_vars[0])
+      elif len(extra_vars) > 1:
+        raise Exception("Invalid CSV file for input data: File contains extra variables %s" % extra_vars)
+
+      # Data
+      self.data = {}
+      self.datasize = 0
+      for varname in self.input_vars:
+        self.data[varname] = []
+      line = f.readline()
+      line_number = 2
+      while line != "":
+        line = line.strip()
+        if line != "":
+          value_tokens = line.split(sep)
+          if len(value_tokens) != len(var_list):
+            raise Exception("Invalid CSV file for input data: invalid value on line %d" % line_number)
+          for var, value in zip(var_list, value_tokens):
+            float_value = float(value)
+            if math.isnan(float_value):
+              raise Exception("Invalid CSV file for input data: invalid value on line %d" % line_number)
+            self.data[var].append(float_value)
+          self.datasize += 1
+        line = f.readline()
+        line_number += 1
 
   def export_data_to_csv_file(self, filepath, sep = ","):
     if self.data is None:
