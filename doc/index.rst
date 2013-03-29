@@ -1,5 +1,5 @@
 ..
-   Copyright (C) 2012 EDF
+   Copyright (C) 2012-2013 EDF
 
    This file is part of SALOME PARAMETRIC module.
 
