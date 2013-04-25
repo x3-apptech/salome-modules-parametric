@@ -24,10 +24,10 @@ import salome
 from salome.kernel.studyedit import getStudyEditor
 from study import ParametricStudy
 
-job_script_template = """
-#!/usr/bin/env python
+job_script_template = """#!/usr/bin/env python
 
 import salome
+from salome.kernel.studyedit import getStudyEditor
 import PARAMETRIC
 
 salome.salome_init()
@@ -35,8 +35,12 @@ salome.salome_init()
 # load study
 study = salome.myStudyManager.Open("%(input_study)s")
 
-# start container and load PARAMETRIC component
-comp = salome.lcc.FindOrLoadComponent("ParametricContainer", "PARAMETRIC")
+# start container, load PARAMETRIC component and load the content of the parametric study in the component
+ed = getStudyEditor(study._get_StudyId())
+sobj = study.FindObjectID("%(param_entry)s")
+scomp = sobj.GetFatherComponent()
+ed.loadComponentEngine(scomp, "ParametricContainer")
+comp = scomp.GetObject()
 
 # run parametric study
 comp.RunStudy(study._get_StudyId(), "%(param_entry)s")
