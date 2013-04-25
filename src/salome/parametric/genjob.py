@@ -43,7 +43,7 @@ ed.loadComponentEngine(scomp, "ParametricContainer")
 comp = scomp.GetObject()
 
 # run parametric study
-comp.RunStudy(study._get_StudyId(), "%(param_entry)s")
+comp.RunStudy(study._get_StudyId(), "%(param_entry)s", False)
 
 # save study
 salome.myStudyManager.SaveAs("%(output_study)s", study, False)

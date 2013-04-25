@@ -202,7 +202,7 @@ def run_study():
     ed = ParametricStudyEditor()
     entry = salome.sg.getSelected(0)
     engine = ed.find_or_create_engine()
-    engine.RunStudy(ed.study_id, entry)
+    engine.RunStudy(ed.study_id, entry, True)
     qapp.restoreOverrideCursor()
   except SALOME.SALOME_Exception, exc:
     qapp.restoreOverrideCursor()

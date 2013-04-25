@@ -171,7 +171,7 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       self.salome_runtime.addCatalog(self.session_catalog)
     return self.salome_runtime
 
-  def RunStudy(self, salomeStudyID, entry):
+  def RunStudy(self, salomeStudyID, entry, localOnly):
     try:
       self.beginService("PARAMETRIC.RunStudy")
 
@@ -196,7 +196,8 @@ class PARAMETRIC(PARAMETRIC_ORB__POA.PARAMETRIC_Gen, SALOME_ComponentPy_i, SALOM
       proc.edAddChild(foreach)
       
       distrib_container = proc.createContainer("DistribContainer")
-      distrib_container.setProperty("hostname", "localhost")
+      if localOnly:
+        distrib_container.setProperty("hostname", "localhost")
 
       if param_study.solver_code_type == ParametricStudy.SALOME_COMPONENT:
         solver_code = param_study.salome_component_name

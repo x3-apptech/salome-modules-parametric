@@ -40,7 +40,8 @@ interface PARAMETRIC_Gen : Engines::EngineComponent, SALOMEDS::Driver
       raises (SALOME::SALOME_Exception);
 
     void RunStudy(in long salomeStudyID,
-                  in SALOMEDS::ID entry)
+                  in SALOMEDS::ID entry,
+                  in boolean localOnly)
       raises (SALOME::SALOME_Exception);
 
     void ExportToCSV(in long salomeStudyID,
