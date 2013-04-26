@@ -88,6 +88,7 @@ class Wizard(QtGui.QWidget, Ui_Wizard):
   def define_values(self):
     exchange_vars = self.select_vars_frame.getSelectedExchangeVariables()
     self.define_values_frame.set_variables(exchange_vars.inputVarList)
+    self.define_values_frame.set_pyscript_label_from_vars(exchange_vars)
 
   def set_pyscript_label(self):
     exchange_vars = self.select_vars_frame.getSelectedExchangeVariables()

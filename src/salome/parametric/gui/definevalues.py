@@ -60,6 +60,19 @@ class DefineValuesFrame(QtGui.QWidget, Ui_SampleDefinition):
         self.varwidgets[var] = range_widget
         self.variablesRangesWidget.layout().insertWidget(idx_var, range_widget)
 
+  def set_pyscript_label_from_vars(self, exchange_vars):
+    input_var_names = [var.name for var in exchange_vars.inputVarList]
+    text  = "This script must create a NumPy array of dimension (n, %d)" % len(input_var_names)
+    text += " named <b>sample</b> where n is the number of points in the sample."
+    if len(input_var_names) > 1:
+      text += "<br>The order of the input variables (columns of the sample) must be"
+      for i, var in enumerate(input_var_names):
+        if i != 0:
+          text += ","
+        text += " <b>" + var + "</b>"
+      text += "."
+    self.pyscriptLabel.setText(text)
+
   def study_to_gui(self, param_study):
     if param_study.sample_definition_method == ParametricStudy.SAMPLE_VAR_RANGE:
       self.variableRangeRB.setChecked(True)

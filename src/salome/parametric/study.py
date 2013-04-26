@@ -123,6 +123,8 @@ class ParametricStudy:
   def generate_data(self):
     if self.sample_definition_method == ParametricStudy.SAMPLE_VAR_RANGE:
       self.generate_data_complete_sampling()
+    elif self.sample_definition_method == ParametricStudy.SAMPLE_PYTHON_SCRIPT:
+      self.generate_data_python_script()
     elif self.sample_definition_method == ParametricStudy.SAMPLE_CSV_FILE:
       self.generate_data_from_csv_file()
     else:
@@ -148,6 +150,27 @@ class ParametricStudy:
       for value in numpy.arange(varrange.min, varrange.max, varrange.step):
         self._value_dict[varname] = value
         self._fill_data_complete_sampling(next_var_list)
+
+  def generate_data_python_script(self):
+    context = {}
+    exec self.sample_python_script in context
+
+    # Basic check on the "sample" array
+    if not context.has_key("sample"):
+      raise Exception('Python script did not create "sample" object')
+    sample = context["sample"]
+    if type(sample) != numpy.ndarray:
+      raise Exception('"sample" object created in Python script is not a numpy array')
+    if sample.ndim != 2:
+      raise Exception('Wrong dimension: "sample" array should be a 2-dimension array')
+    if sample.shape[1] != len(self.input_vars):
+      raise Exception('Wrong size: "sample" array should have %d columns' % len(self.input_vars))
+
+    # Store data in the parametric study
+    self.data = {}
+    for (idx, varname) in enumerate(self.input_vars):
+      self.data[varname] = sample[:,idx]
+    self.datasize = sample.shape[0]
 
   def generate_data_from_csv_file(self, sep = ","):
     if self.sample_csv_file is None:

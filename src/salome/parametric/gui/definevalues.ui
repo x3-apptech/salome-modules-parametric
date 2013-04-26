@@ -116,7 +116,7 @@
           </font>
          </property>
          <property name="text">
-          <string>This script must create a NumPy array of dimension (m,n) named &lt;b&gt;sample&lt;/b&gt;&lt;br&gt;- where m is the number of points in the sample&lt;br&gt;- where n is the number of input variables</string>
+          <string/>
          </property>
         </widget>
        </item>
