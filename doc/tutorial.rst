@@ -17,21 +17,21 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Parametric module documentation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+########
+Tutorial
+########
 
-This documentation covers the usage of PARAMETRIC module in Salome. This module
-aims at creating and running parametric studies in Salome. Here, the term
-"parametric study" means a simulation where one or several numerical parameters
-can vary in a given range. This module provides a way to run the simulation for
-different values of those parameters, and to distribute the computations across
-several machines.
-
-The documentation of this module is currently only a tutorial that gives a
-quick insight in the usage and goals of this module.
+This tutorial explains how to create and run a parametric study with the
+PARAMETRIC module in Salome. In all this documentation, we will use the example
+calculation code "DEVIATION" that is defined in the module GENERICSOLVER.
+It is an implementation of a classical example: the computation of the
+deviation of a cantilever beam.
 
 .. toctree::
    :maxdepth: 2
 
-   tutorial.rst
+   tut_deterministic.rst
+   tut_variables.rst
+   tut_values.rst
+   tut_solver.rst
+   tut_execution.rst
