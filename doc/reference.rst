@@ -17,23 +17,16 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Parametric module documentation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+###############
+Reference Guide
+###############
 
-This documentation covers the usage of PARAMETRIC module in Salome. This module
-aims at creating and running parametric studies in Salome. Here, the term
-"parametric study" means a simulation where one or several numerical parameters
-can vary in a given range. This module provides a way to run the simulation for
-different values of those parameters, and to distribute the computations across
-several machines.
-
-The documentation of this module is divided in two parts. The tutorial gives a
-quick insight in the usage and goals of this module. The reference guide
-details the main features of the module.
+This reference guide details the main features of the PARAMETRIC module.
 
 .. toctree::
    :maxdepth: 2
 
-   tutorial.rst
-   reference.rst
+   ref_values.rst
+   ref_solver.rst
+   ref_execution.rst
+   ref_csv_export.rst

@@ -17,23 +17,17 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Parametric module documentation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+=========================================================
+Exporting the results and analyzing them in a spreadsheet
+=========================================================
 
-This documentation covers the usage of PARAMETRIC module in Salome. This module
-aims at creating and running parametric studies in Salome. Here, the term
-"parametric study" means a simulation where one or several numerical parameters
-can vary in a given range. This module provides a way to run the simulation for
-different values of those parameters, and to distribute the computations across
-several machines.
+The results exported from the PARAMETRIC module have a predefined format
+(comma-separated values, dot used as the decimal separator, etc.). It may be
+necessary to configure the CSV import function of your spreadsheet to open the
+results properly. For instance with LibreOffice Calc you will have to use the
+following parameters:
 
-The documentation of this module is divided in two parts. The tutorial gives a
-quick insight in the usage and goals of this module. The reference guide
-details the main features of the module.
-
-.. toctree::
-   :maxdepth: 2
-
-   tutorial.rst
-   reference.rst
+* Language: English (U.S.A)
+* Separator: Comma
+* Text separator: "
+* Select "Detect special numbers"
