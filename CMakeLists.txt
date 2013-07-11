@@ -44,10 +44,7 @@ IF(SALOME_BUILD_DOC)
   FIND_PACKAGE(SalomeSphinx REQUIRED)
 ENDIF()
 
-SET(BINDIR bin/salome)
-SET(RESDIR share/salome/resources/parametric)
-SET(LIBDIR lib/salome)
-SET(PYTHONDIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages/salome)
+SET(RESDIR ${SALOME_INSTALL_RES}/parametric)
 SET(DOCDIR share/doc/salome/gui/PARAMETRIC)
 
 ADD_SUBDIRECTORY(idl)

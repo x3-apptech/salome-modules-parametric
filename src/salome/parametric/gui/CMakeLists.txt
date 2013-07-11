@@ -25,7 +25,7 @@ SET(PYTHON_FILES
   wizard.py
 )
 SET(PYUIC_FILES wizard_ui.py varrange_ui.py execparams_ui.py genjob_ui.py definevalues_ui.py)
-SET(INSTALL_DIR ${PYTHONDIR}/salome/parametric/gui)
+SET(INSTALL_DIR ${SALOME_INSTALL_PYTHON}/salome/parametric/gui)
 
 FOREACH(OUTPUT ${PYUIC_FILES})
   STRING(REPLACE "_ui.py" ".ui" INPUT ${OUTPUT})
