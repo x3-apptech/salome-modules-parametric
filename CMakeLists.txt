@@ -33,13 +33,13 @@ ENDIF(NOT GUI_ROOT_DIR)
 SET(CMAKE_MODULE_PATH ${KERNEL_ROOT_DIR}/salome_adm/cmake_files
                       ${GUI_ROOT_DIR}/adm_local/cmake_files)
 
-FIND_PACKAGE(SalomePYTHON)
-FIND_PACKAGE(OMNIORB)
-FIND_PACKAGE(SalomeSPHINX)
+INCLUDE(SalomeMacros)
+FIND_PACKAGE(SalomePython)
+FIND_PACKAGE(SalomeOmniORB)
+FIND_PACKAGE(SalomeOmniORBPy)
+FIND_PACKAGE(SalomeSphinx)
 FIND_PACKAGE(SalomeSIP)
-FIND_PACKAGE(SalomePYQT4)
-
-INCLUDE(${KERNEL_ROOT_DIR}/salome_adm/cmake_files/SalomeMacros.cmake)
+FIND_PACKAGE(SalomePyQt4)
 
 SET(BINDIR bin/salome)
 SET(RESDIR share/salome/resources/parametric)
