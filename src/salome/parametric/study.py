@@ -27,9 +27,7 @@ import PARAMETRIC
 
 PARAM_STUDY_TYPE_ID = 1
 
-# We must use FactoryServerPy for now because it is the one that is used by GUI
-# when automatically loading the engine
-PARAMETRIC_ENGINE_CONTAINER = "FactoryServerPy"
+PARAMETRIC_ENGINE_CONTAINER = "FactoryServer"
 
 class ParametricStudyEditor:
   """
