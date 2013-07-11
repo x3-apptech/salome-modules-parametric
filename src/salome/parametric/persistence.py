@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
 import h5py
 
 from study import ParametricStudy, VariableRange
@@ -22,7 +23,7 @@ from study import ParametricStudy, VariableRange
 def save_param_study_dict(param_study_dict, filename):
   with h5py.File(filename, "w") as f:
     f.attrs["filetype"] = "salome_parametric" # simple tag used to identify PARAMETRIC files
-    f.attrs["version"] = "7.2" # version tag used to ensure backwards compatibility
+    f.attrs["version"] = "7.3" # version tag used to ensure backwards compatibility
     for entry, param_study in param_study_dict.iteritems():
       param_study_group = f.create_group(entry)
       if param_study.name is not None:
@@ -72,7 +73,9 @@ def save_param_study_dict(param_study_dict, filename):
       # Data
       if param_study.data is not None:
         ordered_vars = param_study.input_vars + param_study.output_vars
-        dset = param_study_group.create_dataset("data", (param_study.datasize, len(ordered_vars)))
+        dset = param_study_group.create_dataset("data",
+                                                shape = (param_study.datasize, len(ordered_vars)),
+                                                dtype = numpy.float64)
         dset.attrs["ordered_vars"] = ordered_vars
         for idx_var, var in enumerate(ordered_vars):
           if var in param_study.data and len(param_study.data[var]) > 0:
@@ -95,13 +98,17 @@ def load_param_study_dict(filename):
     version = f.attrs.get("version")
     if filetype is None or filetype != "salome_parametric" or version is None:
       raise Exception("The file is not a valid parametric study file")
-    if version == "7.2":
-      param_study_dict = _load_param_study_dict_7_2(f)
+    if version == "7.2" or version == "7.3":
+      param_study_dict = _load_param_study_dict_7_3(f)
     else:
       raise Exception('Invalid version "%s" for parametric study file' % version)
   return param_study_dict
 
-def _load_param_study_dict_7_2(hdffile):
+def _load_param_study_dict_7_3(hdffile):
+  """
+  This method loads a parametric study saved in 7.2 or 7.3 format. The only difference
+  between them is that the dataset is saved in float32 in 7.2 and in float64 in 7.3.
+  """
   param_study_dict = {}
   for entry, param_study_group in hdffile.iteritems():
     param_study = ParametricStudy()
@@ -151,7 +158,12 @@ def _load_param_study_dict_7_2(hdffile):
       param_study.data = {}
       param_study.datasize = len(dset)
       for idx_var, var in enumerate(ordered_vars):
-        param_study.data[var] = list(dset[:,idx_var])
+        col = dset[:,idx_var]
+        if col.dtype == numpy.float64:
+          col64 = col
+        else:
+          col64 = col.astype(numpy.float64) # In version 7.2 the dataset was saved as a float32 array
+        param_study.data[var] = list(col64)
 
       # Error messages
       if "error_message" in param_study_group:
