@@ -34,6 +34,11 @@ SET(CMAKE_MODULE_PATH ${KERNEL_ROOT_DIR}/salome_adm/cmake_files
                       ${GUI_ROOT_DIR}/adm_local/cmake_files)
 
 INCLUDE(SalomeMacros)
+
+# User options
+# ============
+OPTION(SALOME_BUILD_DOC "Generate SALOME PARAMETRIC documentation" ON)
+
 FIND_PACKAGE(SalomeKERNEL REQUIRED)
 FIND_PACKAGE(SalomePython)
 FIND_PACKAGE(SalomeOmniORB)
