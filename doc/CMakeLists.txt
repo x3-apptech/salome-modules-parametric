@@ -15,16 +15,42 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-MESSAGE(STATUS "Creation of ${CMAKE_CURRENT_BINARY_DIR}/conf.py")
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in ${CMAKE_CURRENT_BINARY_DIR}/conf.py @ONLY)
+SET(RSTFILES
+  index.rst
+  reference.rst
+  ref_solver.rst
+  tut_deterministic.rst
+  tutorial.rst
+  tut_values.rst
+  ref_csv_export.rst
+  ref_execution.rst
+  ref_values.rst
+  tut_execution.rst
+  tut_solver.rst
+  tut_variables.rst
+)
 
-SET(RSTFILES index.rst)
-SET(OUTDIR ${CMAKE_CURRENT_BINARY_DIR}/html)
+SET(SPHINXOPTS )
+SET(SOURCEDIR ${CMAKE_CURRENT_SOURCE_DIR})
+SET(PAPEROPT_a4 -D latex_paper_size=a4)
+SET(ALLSPHINXOPTS -d doctrees ${PAPEROPT_a4} ${SPHINXOPTS} ${SOURCEDIR})
 
-ADD_CUSTOM_TARGET(BUILD_DOC ALL
-                  COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_CURRENT_BINARY_DIR}
-                                               -d ${CMAKE_CURRENT_BINARY_DIR}/doctrees
-                                               ${CMAKE_CURRENT_SOURCE_DIR} ${OUTDIR}
-                 )
+# install user's documentation
 
-INSTALL(DIRECTORY ${OUTDIR}/ DESTINATION ${DOCDIR})
+SALOME_CONFIGURE_FILE(conf.py.in conf.py)
+
+SET(HTML_ROOT_FILE html/index.html)
+
+ADD_CUSTOM_COMMAND(OUTPUT ${HTML_ROOT_FILE} 
+  COMMAND ${CMAKE_COMMAND} -E make_directory html 
+  COMMAND ${CMAKE_COMMAND} -E make_directory doctrees
+  COMMAND ${SPHINX_EXECUTABLE} -c ${CMAKE_BINARY_DIR}/doc -b html ${ALLSPHINXOPTS} html
+  DEPENDS ${RSTFILES}
+)
+
+ADD_CUSTOM_TARGET(BUILD_HTML ALL DEPENDS ${HTML_ROOT_FILE})
+
+INSTALL(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html/ 
+  DESTINATION ${SALOME_PARAMETRIC_INSTALL_DOC}
+  PATTERN ".buildinfo" EXCLUDE
+)

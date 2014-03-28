@@ -15,9 +15,20 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-INSTALL(DIRECTORY ./ DESTINATION ${RESDIR} FILES_MATCHING PATTERN "*.png")
-INSTALL(FILES PARAMETRICCatalog.xml DESTINATION ${RESDIR})
+SET(PARAMETRIC_RESOURCES_FILES
+  export_to_csv_file.png
+  new_param_study.png
+  PARAMETRIC.png
+  param_study.png
+  edit_param_study.png
+  generate_job.png
+  PARAMETRICCatalog.xml
+  PARAMETRIC_small.png
+  run_param_study.png
+)
+
+INSTALL(FILES ${PARAMETRIC_RESOURCES_FILES} DESTINATION ${SALOME_PARAMETRIC_INSTALL_RES_DATA})
 
 MESSAGE(STATUS "Creation of ${CMAKE_CURRENT_BINARY_DIR}/SalomeApp.xml")
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/SalomeApp.xml.in ${CMAKE_CURRENT_BINARY_DIR}/SalomeApp.xml @ONLY)
-INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/SalomeApp.xml DESTINATION ${RESDIR})
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/SalomeApp.xml DESTINATION ${SALOME_PARAMETRIC_INSTALL_RES_DATA})

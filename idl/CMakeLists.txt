@@ -15,17 +15,25 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
-INCLUDE(UseOmniORB)
+INCLUDE(UseOmniORB)  # Provided by KERNEL
 
 INCLUDE_DIRECTORIES(
   ${OMNIORB_INCLUDE_DIR}
-  ${KERNEL_ROOT_DIR}/include/salome
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${KERNEL_INCLUDE_DIRS}
 )
 
-SET(PARAMETRIC_IDL_FILES PARAMETRIC_Gen.idl)
-SET(IDL_INCLUDE_DIRS ${KERNEL_ROOT_DIR}/idl/salome)
+SET(SalomeIDLPARAMETRIC_IDLSOURCES
+  PARAMETRIC_Gen.idl
+)
 
-OMNIORB_ADD_MODULE(SalomeIDLPARAMETRIC "${PARAMETRIC_IDL_FILES}" "${IDL_INCLUDE_DIRS}"
-                   ${KERNEL_SalomeIDLKernel})
-INSTALL(TARGETS SalomeIDLPARAMETRIC DESTINATION ${SALOME_INSTALL_LIBS})
+SET(_idl_include_dirs
+  ${KERNEL_ROOT_DIR}/idl/salome
+)
+
+SET(_idl_link_flags
+  ${KERNEL_SalomeIDLKernel}
+)
+
+OMNIORB_ADD_MODULE(SalomeIDLPARAMETRIC "${SalomeIDLPARAMETRIC_IDLSOURCES}" "${_idl_include_dirs}" "${_idl_link_flags}")
+INSTALL(TARGETS SalomeIDLPARAMETRIC EXPORT ${PROJECT_NAME}TargetGroup DESTINATION ${SALOME_INSTALL_LIBS})

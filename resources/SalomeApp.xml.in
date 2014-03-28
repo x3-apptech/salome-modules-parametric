@@ -5,14 +5,14 @@
     <parameter name="icon"              value="PARAMETRIC.png"/>
     <parameter name="library"           value="SalomePyQtGUI"/>
     <parameter name="documentation"     value="parametric_help"/>
-    <parameter name="version"           value="@VERSION@"/>
+    <parameter name="version"           value="@SALOMEPARAMETRIC_VERSION@"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
-    <parameter name="PARAMETRIC" value="%PARAMETRIC_ROOT_DIR%/@RESDIR@"/>
+    <parameter name="PARAMETRIC" value="%PARAMETRIC_ROOT_DIR%/share/salome/resources/parametric"/>
   </section>
   <section name="parametric_help">
     <parameter name="sub_menu"     value="%1 module"/>
-    <parameter name="User's Guide" value="%PARAMETRIC_ROOT_DIR%/@DOCDIR@/index.html"/>
+    <parameter name="User's Guide" value="%PARAMETRIC_ROOT_DIR%/share/doc/salome/gui/PARAMETRIC/index.html"/>
   </section>
 </document>
