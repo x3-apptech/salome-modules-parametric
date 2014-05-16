@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright (C) 2012-2013 EDF
+# Copyright (C) 2012-2014 EDF
 #
 # This file is part of SALOME PARAMETRIC module.
 #
@@ -55,7 +55,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Parametric module'
-copyright = u'2012-2013, EDF'
+copyright = u'2012-2014, EDF'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
