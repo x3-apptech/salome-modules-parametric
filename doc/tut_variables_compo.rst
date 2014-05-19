@@ -17,7 +17,7 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-.. _tut-variables-label:
+.. _tut-variables-compo-label:
 
 =====================================================================
 Step 2: Define the parametric variables and the variables of interest
@@ -69,4 +69,4 @@ using the "New..." buttons.
 Finally, when you have selected all the desired variables, click button
 "Next >>" to proceed to the next step.
 
-:ref:`tut-values-label`
+:ref:`tut-values-compo-label`

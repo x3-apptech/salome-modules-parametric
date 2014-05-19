@@ -63,4 +63,4 @@ the values set for the variables:
 Now we have defined the target of our parametric study. It's time to describe
 what this study will look like.
 
-:ref:`tut-variables-label`
+:ref:`tut-variables-compo-label`

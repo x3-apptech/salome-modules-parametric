@@ -19,15 +19,20 @@ SET(RSTFILES
   index.rst
   reference.rst
   ref_solver.rst
-  tut_deterministic.rst
-  tutorial.rst
-  tut_values.rst
+  tut_deterministic_compo.rst
+  tutorial_compo.rst
+  tut_values_compo.rst
   ref_csv_export.rst
   ref_execution.rst
   ref_values.rst
-  tut_execution.rst
-  tut_solver.rst
-  tut_variables.rst
+  tut_execution_compo.rst
+  tut_solver_compo.rst
+  tut_variables_compo.rst
+  tutorial_python.rst
+  tut_values_python.rst
+  tut_execution_python.rst
+  tut_solver_python.rst
+  tut_variables_python.rst
 )
 
 SET(SPHINXOPTS )

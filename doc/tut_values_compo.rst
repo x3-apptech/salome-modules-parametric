@@ -17,7 +17,7 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-.. _tut-values-label:
+.. _tut-values-compo-label:
 
 ======================================================
 Step 3: Define the values for the parametric variables
@@ -41,4 +41,4 @@ for each variable along with the sampling step, as illustrated below.
 Then click button "Next >>" to proceed to the last step of the parametric
 study creation.
 
-:ref:`tut-solver-label`
+:ref:`tut-solver-compo-label`

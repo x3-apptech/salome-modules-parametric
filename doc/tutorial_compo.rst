@@ -17,21 +17,21 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-########
-Tutorial
-########
+######################################################################
+Tutorial: Parametric study using a SALOME component as the solver code
+######################################################################
 
-This tutorial explains how to create and run a parametric study with the
-PARAMETRIC module in Salome. In all this documentation, we will use the example
-calculation code "DEVIATION" that is defined in the module GENERICSOLVER.
-It is an implementation of a classical example: the computation of the
-deviation of a cantilever beam.
+This tutorial explains how to create and run a parametric study using a SALOME
+component as the solver code. We will use the example calculation code
+"DEVIATION" that is defined in the module GENERICSOLVER. It is an
+implementation of a classical example: the computation of the deviation of a
+cantilever beam.
 
 .. toctree::
    :maxdepth: 2
 
-   tut_deterministic.rst
-   tut_variables.rst
-   tut_values.rst
-   tut_solver.rst
-   tut_execution.rst
+   tut_deterministic_compo.rst
+   tut_variables_compo.rst
+   tut_values_compo.rst
+   tut_solver_compo.rst
+   tut_execution_compo.rst

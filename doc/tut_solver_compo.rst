@@ -17,7 +17,7 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-.. _tut-solver-label:
+.. _tut-solver-compo-label:
 
 ======================================================
 Step 4: Define the solver and the execution parameters
@@ -46,4 +46,4 @@ study. A new item representing the study appears in the object browser.
 .. image:: /_static/ob_new_study.png
    :align: center
 
-:ref:`tut-execution-label`
+:ref:`tut-execution-compo-label`

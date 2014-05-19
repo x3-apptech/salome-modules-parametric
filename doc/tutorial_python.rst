@@ -17,24 +17,23 @@
    along with SALOME PARAMETRIC module.  If not, see <http://www.gnu.org/licenses/>.
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Parametric module documentation
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+###################################################################
+Tutorial: Parametric study using a Python script as the solver code
+###################################################################
 
-This documentation covers the usage of PARAMETRIC module in Salome. This module
-aims at creating and running parametric studies in Salome. Here, the term
-"parametric study" means a simulation where one or several numerical parameters
-can vary in a given range. This module provides a way to run the simulation for
-different values of those parameters, and to distribute the computations across
-several machines.
+This tutorial explains how to create and run a parametric study using a Python
+script as the solver code. We will use an example script that implements a
+classical example: the computation of the deviation of a cantilever beam.
 
-The documentation of this module is divided in three parts. The two tutorials
-give a quick insight in the usage and goals of this module. The reference guide
-details the main features of the module.
+This computation is done with the simple formula
+*dev = (F * L * L * L) / (3. * E * I)*, where *dev* is the deviation, *F* is
+the vertical force applied to the end of the beam, *L* is the length of the
+beam, *E* is the Young's modulus and *I* is the section modulus.
 
 .. toctree::
    :maxdepth: 2
 
-   tutorial_python.rst
-   tutorial_compo.rst
-   reference.rst
+   tut_variables_python.rst
+   tut_values_python.rst
+   tut_solver_python.rst
+   tut_execution_python.rst
