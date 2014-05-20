@@ -46,6 +46,27 @@ The dimension of this array must thus be (n, d) where n is the number of
 points in the sample and d is the number of parametric variables. This Numpy
 array must be stored in a variable named "sample".
 
+Example of a script that specifies the whole sample::
+
+   import numpy as np
+   sample = np.array(((900.0,  0.5),
+                      (800.0,  0.6),
+                      (850.0,  0.2),
+                      (1032.0, 0.8),
+                      (1420.2, 0.5)))
+
+Example of a script building the sample as the cartesian product of two lists::
+
+   import numpy as np
+   import itertools
+
+   F_values = (900.0, 800.0, 850.0, 1032.0, 1420.2)
+   L_values = (0.5, 0.6, 0.2, 0.8, 1.0)
+
+   it = itertools.product(F_values, L_values)
+   sample = np.array(list(it))
+
+
 Importation of a sample defined in a CSV file
 =============================================
 
@@ -59,3 +80,12 @@ meet some requirements:
 * Each other line must contain a number of values equal to the number of
   parametric variables, separated by commas. Each line corresponds to a point
   in the sample.
+
+Example of a CSV file containing variables *F* and *L*::
+
+   F,L
+   900,0.5
+   800,0.6
+   850,0.2
+   1032,0.8
+   1420.2,0.5
