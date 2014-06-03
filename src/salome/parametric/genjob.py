@@ -33,6 +33,7 @@ import PARAMETRIC
 salome.salome_init()
 
 # load study
+salome.myStudyManager.Close(salome.myStudy)
 study = salome.myStudyManager.Open("%(input_study)s")
 
 # start container, load PARAMETRIC component and load the content of the parametric study in the component
